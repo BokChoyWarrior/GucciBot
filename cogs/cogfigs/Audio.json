@@ -1,0 +1,132 @@
+{
+  "sound_commands": [
+    {"name":  "btc",
+    "phrases":[
+      "btc",
+      "bitcoin",
+      "xmr",
+      "crypto",
+      "bitconnect"
+    ],
+      "sounds": ["btc"]
+    },
+    {"name": "dota",
+      "phrases":
+      [
+        "<@&382945841666719754>",
+        "dota2",
+        "dota"
+      ],
+      "sounds":
+      [
+        "stop inviting me to dota.mp3",
+        "At Valve.mp3"
+      ]
+    },
+    {"name": "congratulate",
+      "phrases":
+      [
+        "well done",
+        "good job",
+        "wow!"
+      ],
+      "sounds":
+      [
+        "clap.mp3"
+      ]
+    },
+    {"name" : "mlg",
+    "phrases":
+    [
+      "mlg",
+      "pro"
+    ],
+    "sounds":
+    [
+      "air horn.mp3",
+      "clap.mp3"
+    ]
+    },
+    {"name":"spongebob",
+    "phrases":
+    [
+      "spongebob",
+      "patrick",
+      "squidward"
+    ],
+      "sounds": ["spongebob.mp3"]
+    },
+    {
+      "name": "csgo",
+      "phrases"
+      :
+      [
+        "<@&455413767770079233>",
+        "csgo",
+        "cs:go",
+        "cs"
+      ],
+      "sounds":
+      [
+        "stop inviting me to csgo.mp3"
+      ]
+    },
+    {"name": "salt",
+    "phrases": [
+      "salt",
+      "salty",
+      "rq",
+      "ragequit",
+      "rage"
+    ],
+    "sounds": [
+      "fuck off or i'm blocking.mp3",
+      "you truely are sad pathetic man.mp3",
+      "let me ask u smth ya deep shit.mp3",
+      "Filthy casual can't even tech properly.mp3",
+      "Ever since ultimate came out my for glory score hasn't improved.mp3"
+    ]
+    },
+    {"name": "gaymers",
+    "phrases": [
+      "gaming",
+      "gamers",
+      "gamer",
+      "gaymers",
+      "gaymer"
+    ],
+    "sounds": [
+      "They targeted gamers.mp3",
+      "“These are people who are uneducated — they.mp3",
+      "PewDiePie isn't racist, he just harbours and.mp3",
+      "Gatekeeping is necessary for Gaming.mp3",
+      "Do you seriously spend over 40 hours (not minutes) a week playing video games.mp3",
+      "Pewdiepie well done, you alienated your viewers.mp3",
+      "The Red Pill is 120.mp3",
+      " thousand fit college educated middle class men.mp3"]
+    },
+    {
+      "name": "stuart little",
+      "phrases": [
+        "stuart",
+        "rat",
+        "mouse"
+      ],
+      "sounds": [
+        "I fucking hate Stuart Little.mp3",
+        "You got two bullets.mp3"
+      ]
+
+    }
+],
+  "reply_commands": [
+    {
+      "name": "sexism",
+      "phrases": [
+        "sexy", "sex", "leila", "girls", "girl", "woman", "bitch", "gyal", "women", "yatties", "bird",
+        "vaginas", "vagina", "grills", "grill"],
+      "reply_string": "That's sexist! You cant say {}!"
+    }
+  ]
+}
+
