@@ -15,7 +15,7 @@ async def check_for_reply(message):
         print(e, "file path is:", fp, sep=" ")
 
     for sound_command in data["sound_commands"]:
-        word = message_contains(sound_command["phrases"], message)
+        word = utils.message_contains(sound_command["phrases"], message)
         if word:
             rick_o_meter = random.randint(1, 100)
             if rick_o_meter != 1:
@@ -31,7 +31,7 @@ async def check_for_reply(message):
                 await message.author.send(content="", tts=False, embed=None, file=f, files=None, nonce=None)
 
     for reply_command in data["reply_commands"]:
-        word = message_contains(reply_command["phrases"], message)
+        word = utils.message_contains(reply_command["phrases"], message)
         if word:
             reply = fetch_reply(word, reply_command)
             await message.channel.send(reply)
