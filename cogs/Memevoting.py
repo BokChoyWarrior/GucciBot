@@ -65,10 +65,7 @@ async def get_winners(messages):
     winners = []
     for message in messages:
         for reaction in message.reactions:
-            if not reaction.emoji == "\U0001f44d":  # :thumbsup:
-                continue
-
-            else:
+            if reaction.emoji == "\U0001f44d":  # :thumbsup:
                 if not winners:
                     winners.append(message)
                     max_reactions = reaction.count
@@ -82,6 +79,9 @@ async def get_winners(messages):
 
                 else:
                     continue
+            elif reaction.emoji == "\U0001f44e":
+                pass
+
 
     return winners
 
@@ -115,11 +115,8 @@ async def get_current_winner_embed(winners, embed):
         else:
             content = winner.content
 
-        if winner.author.nick:
-            author = winner.author.nick
-        else:
-            author = winner.author
-
+        author = winner.author.display_name
+        
         if len(winners) == 1:
             embed.set_thumbnail(url=winner.author.avatar_url)
             winner_string = f"**The winner is {author}!**"
