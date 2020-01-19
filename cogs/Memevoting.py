@@ -19,10 +19,8 @@ class Memevoting(commands.Cog):
 
         if messages:
             winners = await get_winners(messages)
-            await get_winners_str(winners)
             embedded_winners = await get_winners_embed(winners, self.bot.user.avatar_url)
             await memechannel.send(embed=embedded_winners)
-
 
     @commands.Cog.listener()
     async def on_ready(self):
@@ -61,40 +59,39 @@ async def get_winners(messages):
     """
         When given a list of :Class: Message, will return a list of messages with the most :thumbsup: reactions
     """
-    max_reactions = 0
+    max_win_reactions = 0
+    max_lose_reactions = 0
     winners = []
+    losers = []
     for message in messages:
         for reaction in message.reactions:
             if reaction.emoji == "\U0001f44d":  # :thumbsup:
                 if not winners:
                     winners.append(message)
-                    max_reactions = reaction.count
+                    max_win_reactions = reaction.count
 
-                elif reaction.count > max_reactions:
+                elif reaction.count > max_win_reactions:
                     winners = [message]
-                    max_reactions = reaction.count
+                    max_win_reactions = reaction.count
 
-                elif max_reactions == reaction.count:
+                elif max_win_reactions == reaction.count:
                     winners.append(message)
 
-                else:
-                    continue
             elif reaction.emoji == "\U0001f44e":
+                if not losers:
+                    losers.append(message)
+                    max_lose_reactions = reaction.count
+
+                elif reaction.count > max_lose_reactions:
+                    losers = [message]
+                    max_lose_reactions = reaction.count
+
+                elif max_lose_reactions == reaction.count:
+                    losers.append(message)
                 pass
 
-
     return winners
-
-
-async def get_winners_str(winners):
-    winners_string = ""
-    if len(winners) > 1:
-        for i in range(0, len(winners)):
-            winners_string += (str(winners[i].author) + ", ")
-        return f"There was a tie between {winners_string}"
-    else:
-        return f"The winner was {winners[0].author} with message {winners[0].content}!"
-
+    #TODO handle losers
 
 async def get_winners_embed(winners, bot_avatar_url):
     embed = discord.Embed(title="**Weekly meme contest!**", colour=discord.Colour(0x4a90e2),
@@ -116,7 +113,7 @@ async def get_current_winner_embed(winners, embed):
             content = winner.content
 
         author = winner.author.display_name
-        
+
         if len(winners) == 1:
             embed.set_thumbnail(url=winner.author.avatar_url)
             winner_string = f"**The winner is {author}!**"
