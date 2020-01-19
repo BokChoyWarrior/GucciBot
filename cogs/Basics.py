@@ -15,20 +15,10 @@ class Basics(commands.Cog):
     async def on_ready(self):
         print(f"Ready for {self.name}!")
 
-    @commands.command()
+    @commands.command(name="shutdown", aliases=["s", "sh", "sd", "close", "exit"])
     @commands.guild_only()
     @commands.is_owner()
     async def shutdown(self, ctx):
-        """Kills the bot."""
-        await ctx.send("You're such a turnoff")
-        await self.bot.logout()
-        await self.bot.close()
-
-
-    @commands.command()
-    @commands.guild_only()
-    @commands.is_owner()
-    async def s(self, ctx):
         """Kills the bot."""
         await ctx.send("You're such a turnoff")
         await self.bot.logout()
