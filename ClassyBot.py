@@ -21,7 +21,8 @@ initial_extensions = [
     'Fun',
     'Audio',
     "Basics",
-    "Replies"
+    "Replies",
+    "Memevoting"
 ]
 
 
