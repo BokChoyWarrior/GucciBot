@@ -75,7 +75,6 @@ async def on_command(ctx):
 if __name__ == '__main__':
     for extension in initial_extensions:
         try:
-            print(f"Loading {extension}...")
             bot.load_extension("cogs." + extension)
         except Exception as e:
             print(traceback.format_exc())

@@ -1,8 +1,6 @@
 import time
-
 import discord
 from discord.ext import commands
-from discord.ext.commands import bot
 
 
 class Basics(commands.Cog):
@@ -13,7 +11,7 @@ class Basics(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"Ready for {self.name}!")
+        pass
 
     @commands.command(name="shutdown", aliases=["s", "sh", "sd", "close", "exit"])
     @commands.guild_only()

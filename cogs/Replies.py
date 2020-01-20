@@ -1,4 +1,3 @@
-import asyncio
 import json
 import random
 import discord
@@ -59,7 +58,7 @@ class Replies(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"Ready for {self.name}!")
+        pass
 
     @commands.Cog.listener()
     async def on_message(self, message):

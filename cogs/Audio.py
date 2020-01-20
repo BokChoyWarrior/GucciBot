@@ -4,14 +4,14 @@ from discord.ext import commands
 prefix = "!"
 
 
-class Audio(commands.Cog):
+class Audio(commands.Cog, name="Audio"):
     def __init__(self, bot):
         self.bot = bot
         self.name = "Audio"
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print(f"Ready for {self.name}!")
+        pass
 
     @commands.Cog.listener()
     async def on_message(self, message):
