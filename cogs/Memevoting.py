@@ -47,8 +47,9 @@ class Memevoting(commands.Cog):
                     for message in messages:
 
                         await message.add_reaction("\U0001f44d")
+                        await asyncio.sleep(0.3)
                         await message.add_reaction("\U0001f44e")
-                        await asyncio.sleep(1)
+                        await asyncio.sleep(0.3)
                 except discord.HTTPException:
                     pass
                 except discord.Forbidden:
@@ -66,7 +67,9 @@ class Memevoting(commands.Cog):
         if message.channel.id in self.memechannel_ids:
             try:
                 await message.add_reaction("\U0001f44d")
+                await asyncio.sleep(0.3)
                 await message.add_reaction("\U0001f44e")
+                await asyncio.sleep(0.3)
             except discord.errors.NotFound:
                 print("Message was deleted before we could react!")
 
