@@ -15,8 +15,7 @@ class Fun(commands.Cog):
     @commands.Cog.listener()
     async def on_message(self, message):
         prefix = await self.bot.get_prefix(message)
-        if message.author.id == 97054487398592512 or message.author.id == 189449798280019968\
-                or message.author.id == 281128026048036864 or message.author.id == 95945852501127168:
+        if 668798124751323146 in message.author.roles:
             new_message = ""
             i = 0
             for letter in message.content.casefold():
@@ -30,7 +29,7 @@ class Fun(commands.Cog):
             await message.channel.send(content=new_message, file=discord.File("pictures/spongebob-mocking.jpg"),
                                        delete_after=60)
         pass
-        # TODO: do not send message if no content (and only for role)
+        # TODO: do not send message if no content
 
 def setup(bot):
     bot.add_cog(Fun(bot))

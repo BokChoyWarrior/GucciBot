@@ -1,3 +1,4 @@
+import asyncio
 from datetime import *
 import json
 import discord
@@ -7,15 +8,15 @@ from discord.ext import commands
 class Memevoting(commands.Cog):
 
     def __init__(self, bot):
-        self.last_scan = datetime.now(tz=timezone.utc)
+        self.last_scan = datetime.now()
         self.bot = bot
         self.name = "Memevoting"
 
-    async def meme_contest(self, memechannel_id):
+    async def meme_contest(self, memechannel_id, prev_scan):
 
         memechannel = self.bot.get_channel(memechannel_id)
 
-        messages = await memechannel.history().flatten()
+        messages = await memechannel.history(after=prev_scan).flatten()
 
         if messages:
             winners = await get_winners(messages)
@@ -29,15 +30,33 @@ class Memevoting(commands.Cog):
         with open("cogs/cogfigs/Memevoting.json", "r+") as f:
             data = json.load(f)
             self.memechannel_ids = data["memechannel_ids"]
-
-            if self.last_scan - datetime.fromisoformat(data["last_scan"]) > timedelta(7):
+            prev_scan = datetime.fromisoformat(data["last_scan"])
+            if self.last_scan - prev_scan > timedelta(7):
                 print("Scanning...")
                 for memechannel_id in self.memechannel_ids:
-                    await self.meme_contest(memechannel_id)
+                    await self.meme_contest(memechannel_id, prev_scan)
                 with open("cogs/cogfigs/Memevoting.json", "w+") as f:
                     data["memechannel_ids"] = self.memechannel_ids
                     data["last_scan"] = self.last_scan.isoformat()
                     json.dump(data, f, indent=2)
+
+            for memechannel_id in self.memechannel_ids:
+                memechannel = self.bot.get_channel(memechannel_id)
+                messages = await memechannel.history(after=prev_scan).flatten()
+                try:
+                    for message in messages:
+
+                        await message.add_reaction("\U0001f44d")
+                        await message.add_reaction("\U0001f44e")
+                        await asyncio.sleep(1)
+                except discord.HTTPException:
+                    pass
+                except discord.Forbidden:
+                    pass
+                except discord.NotFound:
+                    pass
+                except discord.InvalidArgument:
+                    pass
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -47,6 +66,7 @@ class Memevoting(commands.Cog):
         if message.channel.id in self.memechannel_ids:
             try:
                 await message.add_reaction("\U0001f44d")
+                await message.add_reaction("\U0001f44e")
             except discord.errors.NotFound:
                 print("Message was deleted before we could react!")
 
@@ -98,7 +118,7 @@ async def get_winners_embed(winners, bot_avatar_url):
                           description="Below are the most :thumbsup:'d memes of the week",
                           timestamp=datetime.now(tz=timezone.utc))
 
-    embed.set_footer(text="PradaBot", icon_url=bot_avatar_url)
+    embed.set_footer(text="GucciBot", icon_url=bot_avatar_url)
 
     await get_current_winner_embed(winners, embed)
 
