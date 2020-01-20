@@ -45,11 +45,9 @@ class Memevoting(commands.Cog):
                 messages = await memechannel.history(after=prev_scan).flatten()
                 try:
                     for message in messages:
-
                         await message.add_reaction("\U0001f44d")
-                        await asyncio.sleep(0.3)
+                        await asyncio.sleep(1)
                         await message.add_reaction("\U0001f44e")
-                        await asyncio.sleep(0.3)
                 except discord.HTTPException:
                     pass
                 except discord.Forbidden:
