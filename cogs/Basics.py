@@ -20,7 +20,7 @@ class Basics(commands.Cog):
     @commands.is_owner()
     async def shutdown(self, ctx):
         """Kills the bot."""
-        await ctx.send("You're such a turnoff")
+        await ctx.message.delete()
         await self.bot.logout()
         await self.bot.close()
 
