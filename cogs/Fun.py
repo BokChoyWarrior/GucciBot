@@ -14,8 +14,10 @@ class Fun(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        if message.author.bot:
+            return
         prefix = await self.bot.get_prefix(message)
-        if 668798124751323146 in message.author.roles:
+        if message.guild.get_role(668798124751323146) in message.guild.get_member(message.author.id).roles:
             new_message = ""
             i = 0
             for letter in message.content.casefold():

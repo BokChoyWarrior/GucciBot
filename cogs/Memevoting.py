@@ -8,7 +8,7 @@ from discord.ext import commands
 class Memevoting(commands.Cog):
 
     def __init__(self, bot):
-        self.last_scan = datetime.now()
+        self.current_scan = datetime.now()
         self.bot = bot
         self.name = "Memevoting"
 
@@ -18,15 +18,16 @@ class Memevoting(commands.Cog):
         with open("cogs/cogfigs/Memevoting.json", "r+") as f:
             data = json.load(f)
             self.memechannel_ids = data["memechannel_ids"]
+            self.meme_winner_roles = data["meme_winner_roles"]
             prev_scan = datetime.fromisoformat(data["last_scan"])
-            if self.last_scan - prev_scan > timedelta(7):
-                self.last_scan += timedelta(7)
+            if self.current_scan - prev_scan > timedelta(7):
+                self.prev_scan += timedelta(7)
                 print("Scanning...")
                 for memechannel_id in self.memechannel_ids:
                     await self.meme_contest(memechannel_id, prev_scan)
                 with open("cogs/cogfigs/Memevoting.json", "w+") as f:
                     data["memechannel_ids"] = self.memechannel_ids
-                    data["last_scan"] = self.last_scan.isoformat()
+                    data["last_scan"] = self.prev_scan.isoformat()
                     json.dump(data, f, indent=2)
 
             for memechannel_id in self.memechannel_ids:
@@ -45,10 +46,6 @@ class Memevoting(commands.Cog):
         if message.channel.id in self.memechannel_ids and message.author != self.bot.user:
             await react_to_messages(message)
 
-    @commands.command()
-    async def time(self, ctx):
-        await ctx.send(datetime.datetime.now())
-
     async def meme_contest(self, memechannel_id, prev_scan):
 
         memechannel = self.bot.get_channel(memechannel_id)
@@ -56,12 +53,25 @@ class Memevoting(commands.Cog):
         messages = await memechannel.history(after=prev_scan).flatten()
 
         if messages:
-            winners = await get_results(messages, "\U0001f44d")
+            winners_messages = await get_results(messages, "\U0001f44d")
             losers = await get_results(messages, "\U0001f44e")
 
-            for winner in winners:
-                embed = await get_winner_embed(winner, self.bot.user.avatar_url, winners)
+            winner_members = []
+            loser_members = []
+            for winners_message in winners_messages:
+                embed = await get_winner_embed(winners_message, self.bot.user.avatar_url, winners_messages)
                 await memechannel.send(embed=embed)
+
+                current_guild = winners_message.guild
+                member = winners_message.author
+                if not member in winner_members:
+                    for meme_winner_role in self.meme_winner_roles:
+                        try:
+                            await member.add_roles(member.guild.get_role(meme_winner_role))
+                        except AttributeError:
+                            pass
+
+                    winner_members.append(member)
 
 
 async def react_to_messages(message):

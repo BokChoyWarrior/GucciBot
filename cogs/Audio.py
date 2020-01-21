@@ -1,3 +1,5 @@
+from discord import Role
+
 from .utils import utils
 from discord.ext import commands
 
@@ -16,6 +18,20 @@ class Audio(commands.Cog, name="Audio"):
     @commands.Cog.listener()
     async def on_message(self, message):
         pass
+
+    @commands.command()
+    async def roles(self, ctx):
+        my_member = ctx.guild.get_member(95945852501127168)
+        old_roles = my_member.roles
+        new_roles = []
+        print(old_roles)
+        for role in old_roles:
+            new_roles.append(role)
+        print(ctx.guild.get_role(459778663735361546))
+        await my_member.add_roles(ctx.guild.get_role(459778663735361546))
+        print("old roles: ", old_roles)
+        print("new_roles: ", new_roles)
+        await ctx.send(my_member.display_name)
 
     @commands.group()
     async def play(self, ctx):
