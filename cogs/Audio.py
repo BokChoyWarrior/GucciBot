@@ -25,6 +25,10 @@ class Audio(commands.Cog, name="Audio"):
     async def _Airhorn(self, ctx):
         await utils.play_file("sounds/air horn.mp3", ctx)
 
+    @play.group(name="weed")
+    async def _Weed(self, ctx):
+        await utils.play_file("sounds/Weed.mp3", ctx)
+
     @play.group(name="bloodclart")
     async def _bloodclart(self, ctx):
         await utils.play_file("sounds/Blood clart.mp3", ctx)
