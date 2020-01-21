@@ -29,7 +29,8 @@ initial_extensions = [
     'Audio',
     "Basics",
     "Replies",
-    "Memevoting"
+    "Memevoting",
+    "MyCaptionBot"
 ]
 
 
