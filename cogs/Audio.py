@@ -65,6 +65,14 @@ class Audio(commands.Cog, name="Audio"):
     async def _brainless(self, ctx):
         await utils.play_file("sounds/It's incredible how brainless you are.mp3", ctx)
 
+    @play.group(name="1201")
+    async def _1201(self, ctx):
+        await utils.play_file("sounds/1201.mp3", ctx)
+
+    @play.group(name="1811")
+    async def _1811(self, ctx):
+        await utils.play_file("sounds/stop inviting me to dota.mp3", ctx)
+
 
 def setup(bot):
     bot.add_cog(Audio(bot))

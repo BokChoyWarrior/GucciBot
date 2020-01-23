@@ -18,6 +18,8 @@ class Fun(commands.Cog):
             return
         prefix = await self.bot.get_prefix(message)
         if message.guild.get_role(668798124751323146) in message.guild.get_member(message.author.id).roles:
+            if message.content.startswith("http") or message.content == "":
+                return
             new_message = ""
             i = 0
             for letter in message.content.casefold():
@@ -31,7 +33,7 @@ class Fun(commands.Cog):
             await message.channel.send(content=new_message, file=discord.File("pictures/spongebob-mocking.jpg"),
                                        delete_after=60)
         pass
-        # TODO: do not send message if no content
+
 
 def setup(bot):
     bot.add_cog(Fun(bot))

@@ -19,6 +19,7 @@ class Memevoting(commands.Cog):
             data = json.load(f)
             self.memechannel_ids = data["memechannel_ids"]
             self.meme_winner_roles = data["meme_winner_roles"]
+            self.meme_loser_roles = data["meme_loser_roles"]
             prev_scan = datetime.fromisoformat(data["last_scan"])
             if self.current_scan - prev_scan > timedelta(7):
                 self.prev_scan += timedelta(7)
@@ -54,15 +55,26 @@ class Memevoting(commands.Cog):
 
         if messages:
             winners_messages = await get_results(messages, "\U0001f44d")
-            losers = await get_results(messages, "\U0001f44e")
+            losers_messages = await get_results(messages, "\U0001f44e")
+
+            loser_members = []
+            for losers_message in losers_messages:
+                embed = await get_winner_embed(losers_message, self.bot.user.avatar_url, losers_messages)
+                await memechannel.send(embed=embed)
+                member = losers_message.author
+                if not member in loser_members:
+                    for meme_loser_role in self.meme_loser_roles:
+                        try:
+                            await member.add_roles(member.guild.get_role(meme_loser_role))
+                        except AttributeError:
+                            pass
+                    loser_members.append(member)
 
             winner_members = []
-            loser_members = []
             for winners_message in winners_messages:
                 embed = await get_winner_embed(winners_message, self.bot.user.avatar_url, winners_messages)
                 await memechannel.send(embed=embed)
 
-                current_guild = winners_message.guild
                 member = winners_message.author
                 if not member in winner_members:
                     for meme_winner_role in self.meme_winner_roles:
@@ -129,6 +141,30 @@ async def get_winner_embed(winner, bot_avatar_url, winners):
 
     return embed
 
+
+async def get_loser_embed(loser, bot_avatar_url, losers):
+    if len(losers) > 1:
+        head_title = "\U0001F4A9 Weekly worst memes! \U0001F4A9"
+    else:
+        head_title = "\U0001F4A9 This week's ShItTeSt meme! \U0001F4A9"
+
+    embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2), timestamp=datetime.now(tz=timezone.utc))
+    embed.set_thumbnail(url=loser.author.avatar_url)
+    embed.set_footer(text="GucciBot", icon_url=bot_avatar_url)
+
+    if loser.attachments:
+        content = loser.attachments[0].url
+    else:
+        content = loser.content
+    if content.startswith("http"):
+        embed.set_image(url=content)
+        content_value = f"[Link]({content})"
+    else:
+        content_value = content
+        pass
+    embed.add_field(name=f"**Sent by boring loser {loser.author.display_name}!**", value=content_value)
+
+    return embed
 
 def setup(bot):
     bot.add_cog(Memevoting(bot))
