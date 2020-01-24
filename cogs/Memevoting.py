@@ -20,12 +20,12 @@ class Memevoting(commands.Cog):
             self.memechannel_ids = data["memechannel_ids"]
             self.meme_winner_roles = data["meme_winner_roles"]
             self.meme_loser_roles = data["meme_loser_roles"]
-            prev_scan = datetime.fromisoformat(data["last_scan"])
-            if self.current_scan - prev_scan > timedelta(7):
-                self.prev_scan += timedelta(7)
+            self.prev_scan = datetime.fromisoformat(data["last_scan"])
+            if self.current_scan - self.prev_scan > timedelta(7):
                 print("Scanning...")
                 for memechannel_id in self.memechannel_ids:
-                    await self.meme_contest(memechannel_id, prev_scan)
+                    await self.meme_contest(memechannel_id, self.prev_scan)
+                self.prev_scan += timedelta(7)
                 with open("cogs/cogfigs/Memevoting.json", "w+") as f:
                     data["memechannel_ids"] = self.memechannel_ids
                     data["last_scan"] = self.prev_scan.isoformat()
@@ -33,7 +33,7 @@ class Memevoting(commands.Cog):
 
             for memechannel_id in self.memechannel_ids:
                 memechannel = self.bot.get_channel(memechannel_id)
-                messages = await memechannel.history(after=prev_scan).flatten()
+                messages = await memechannel.history(after=self.prev_scan).flatten()
 
                 for message in messages:
                     if not message.author == self.bot.user:
@@ -50,16 +50,14 @@ class Memevoting(commands.Cog):
     async def meme_contest(self, memechannel_id, prev_scan):
 
         memechannel = self.bot.get_channel(memechannel_id)
-
         messages = await memechannel.history(after=prev_scan).flatten()
-
         if messages:
             winners_messages = await get_results(messages, "\U0001f44d")
             losers_messages = await get_results(messages, "\U0001f44e")
 
             loser_members = []
             for losers_message in losers_messages:
-                embed = await get_winner_embed(losers_message, self.bot.user.avatar_url, losers_messages)
+                embed = await get_loser_embed(losers_message, self.bot.user.avatar_url, losers_messages)
                 await memechannel.send(embed=embed)
                 member = losers_message.author
                 if not member in loser_members:
