@@ -1,3 +1,5 @@
+import asyncio
+
 import discord
 from discord.ext import commands
 
@@ -32,7 +34,17 @@ class Fun(commands.Cog):
                 new_message = new_message + letter_to_add
             await message.channel.send(content=new_message, file=discord.File("pictures/spongebob-mocking.jpg"),
                                        delete_after=60)
-        pass
+
+
+    async def rename_all_members(self, guild_id, name):
+        for member in self.bot.get_guild(guild_id).members:
+            await asyncio.sleep(1)
+            try:
+                await member.edit(reason="Meme contest winner request", nick=name)
+            except discord.Forbidden:
+                print("Forbidden rename on: " + str(member.__repr__))
+            except discord.HTTPException:
+                print("HTTP exception")
 
 
 def setup(bot):

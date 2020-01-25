@@ -19,7 +19,6 @@ def getConfig(path):
 
 config = getConfig("config.json")
 
-
 prefix = "!"
 bot = commands.Bot(command_prefix=config["prefix"], description="Welcome to PradaBot!\nCommands are below:",
                    case_insensitive=True)
@@ -47,7 +46,7 @@ async def on_ready():
     print("Everything's all ready to go~")
     print(f'Logged in as: {bot.user.name} with id: {bot.user.id}')
     print('-' * 50)
-    await bot.change_presence(activity=discord.Activity(type=2, name='the birds sing :-]'))
+    await bot.change_presence(activity=discord.Activity(type=2, name='the pigeons'))
     bot.uptime = datetime.now()
 
 
@@ -79,6 +78,5 @@ if __name__ == '__main__':
             bot.load_extension("cogs." + extension)
         except Exception as e:
             print(traceback.format_exc())
-
 
 bot.run(config["token"])
