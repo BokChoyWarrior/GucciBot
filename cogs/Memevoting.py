@@ -11,25 +11,17 @@ class Memevoting(commands.Cog):
         self.current_scan = datetime.now()
         self.bot = bot
         self.name = "Memevoting"
+        self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
 
     @commands.Cog.listener()
     async def on_ready(self):
 
         with open("cogs/cogfigs/Memevoting.json", "r+") as f:
-            data = json.load(f)
-            self.memechannel_ids = data["memechannel_ids"]
-            self.meme_winner_roles = data["meme_winner_roles"]
-            self.meme_loser_roles = data["meme_loser_roles"]
-            self.prev_scan = datetime.fromisoformat(data["last_scan"])
-            if self.current_scan - self.prev_scan > timedelta(7):
-                print("Scanning...")
-                for memechannel_id in self.memechannel_ids:
-                    await self.meme_contest(memechannel_id, self.prev_scan)
-                self.prev_scan += timedelta(7)
-                with open("cogs/cogfigs/Memevoting.json", "w+") as f:
-                    data["memechannel_ids"] = self.memechannel_ids
-                    data["last_scan"] = self.prev_scan.isoformat()
-                    json.dump(data, f, indent=2)
+            self.data = json.load(f)
+            self.memechannel_ids = self.data["memechannel_ids"]
+            self.meme_winner_roles = self.data["meme_winner_roles"]
+            self.meme_loser_roles = self.data["meme_loser_roles"]
+            self.prev_scan = datetime.fromisoformat(self.data["last_scan"])
 
             for memechannel_id in self.memechannel_ids:
                 memechannel = self.bot.get_channel(memechannel_id)
@@ -39,21 +31,37 @@ class Memevoting(commands.Cog):
                     if not message.author == self.bot.user:
                         await react_to_messages(message)
 
+    async def meme_contest_bg_task(self):
+        await self.bot.wait_until_ready()
+        await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
+        while not self.bot.is_closed():
+            if self.current_scan - self.prev_scan > timedelta(7):
+                print("Scanning...")
+                for memechannel_id in self.memechannel_ids:
+                    await self.get_meme_contest_results(memechannel_id, self.prev_scan)
+                self.prev_scan += timedelta(7)
+                with open("cogs/cogfigs/Memevoting.json", "w+") as f:
+                    self.data["memechannel_ids"] = self.memechannel_ids
+                    self.data["last_scan"] = self.prev_scan.isoformat()
+                    json.dump(self.data, f, indent=2)
+
+            await asyncio.sleep(3600)
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
-        prefix = await self.bot.get_prefix(message)
+
         if message.channel.id in self.memechannel_ids and message.author != self.bot.user:
             await react_to_messages(message)
 
-    async def meme_contest(self, memechannel_id, prev_scan):
+    async def get_meme_contest_results(self, memechannel_id, prev_scan):
 
         memechannel = self.bot.get_channel(memechannel_id)
         messages = await memechannel.history(after=prev_scan).flatten()
         if messages:
-            winners_messages = await get_results(messages, "\U0001f44d")
-            losers_messages = await get_results(messages, "\U0001f44e")
+            winners_messages = await get_reaction_results(messages, "\U0001f44d")
+            losers_messages = await get_reaction_results(messages, "\U0001f44e")
 
             loser_members = []
             for losers_message in losers_messages:
@@ -94,7 +102,7 @@ async def react_to_messages(message):
         print("Message was deleted before we could react!")
 
 
-async def get_results(messages, emoji):
+async def get_reaction_results(messages, emoji):
     """
         When given a list of :Class: Message and an emoji, will return a list of messages with the most emoji reactions
     """
@@ -163,6 +171,7 @@ async def get_loser_embed(loser, bot_avatar_url, losers):
     embed.add_field(name=f"**Sent by boring loser {loser.author.display_name}!**", value=content_value)
 
     return embed
+
 
 def setup(bot):
     bot.add_cog(Memevoting(bot))
