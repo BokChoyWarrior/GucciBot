@@ -19,20 +19,7 @@
       ],
       "sounds":
       [
-        "stop inviting me to dota.mp3",
         "At Valve.mp3"
-      ]
-    },
-        {"name": "1811",
-      "phrases":
-      [
-        "1811",
-        "18:11",
-        "18 11"
-      ],
-      "sounds":
-      [
-        "stop inviting me to dota.mp3"
       ]
     },
     {"name": "congratulate",
@@ -68,21 +55,6 @@
     ],
       "sounds": ["spongebob.mp3"]
     },
-    {
-      "name": "csgo",
-      "phrases"
-      :
-      [
-        "<@&455413767770079233>",
-        "csgo",
-        "cs:go",
-        "cs"
-      ],
-      "sounds":
-      [
-        "stop inviting me to csgo.mp3"
-      ]
-    },
     {"name": "salt",
     "phrases": [
       "salt",
@@ -92,8 +64,6 @@
       "rage"
     ],
     "sounds": [
-      "fuck off or i'm blocking.mp3",
-      "1201.mp3",
       "let me ask u smth ya deep shit.mp3",
       "Filthy casual can't even tech properly.mp3",
       "Ever since ultimate came out my for glory score hasn't improved.mp3"

@@ -14,7 +14,6 @@ class Memevoting(commands.Cog):
 
     @commands.Cog.listener()
     async def on_ready(self):
-        print("memes")
 
         with open("cogs/cogfigs/Memevoting.json", "r+") as f:
             data = json.load(f)
@@ -22,7 +21,6 @@ class Memevoting(commands.Cog):
             self.meme_winner_roles = data["meme_winner_roles"]
             self.meme_loser_roles = data["meme_loser_roles"]
             self.prev_scan = datetime.fromisoformat(data["last_scan"])
-            print(self.prev_scan, self.current_scan)
             if self.current_scan - self.prev_scan > timedelta(7):
                 print("Scanning...")
                 for memechannel_id in self.memechannel_ids:
