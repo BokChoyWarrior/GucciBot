@@ -1,9 +1,9 @@
 import traceback
 from datetime import datetime
 from discord.ext import commands
-import json
 import discord
 import logging
+import config
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
@@ -12,14 +12,7 @@ handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(me
 logger.addHandler(handler)
 
 
-def getConfig(path):
-    configFile = open(path, "r")
-    return json.loads(configFile.read())
-
-
-config = getConfig("config.json")
-
-prefix = "!"
+prefix = config.prefix
 bot = commands.Bot(command_prefix=config["prefix"], description="Welcome to PradaBot!\nCommands are below:",
                    case_insensitive=True)
 
@@ -79,4 +72,4 @@ if __name__ == '__main__':
         except Exception as e:
             print(traceback.format_exc())
 
-bot.run(config["token"])
+bot.run(config.token)
