@@ -11,7 +11,7 @@ chardet==3.0.4
 constantly==15.1.0
 discord==1.0.1
 discord.py==1.2.5
-Django==3.0.1
+Django==3.0.3
 heroku==0.1.4
 humanize==0.5.1
 hyperlink==19.0.0
