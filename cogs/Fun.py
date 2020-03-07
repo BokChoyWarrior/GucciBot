@@ -33,7 +33,7 @@ class Fun(commands.Cog):
                     i -= 1
                 new_message = new_message + letter_to_add
             await message.channel.send(content=new_message, file=discord.File("pictures/spongebob-mocking.jpg"),
-                                       delete_after=60)
+                                       delete_after=3600)
 
 
     async def rename_all_members(self, guild_id, name):

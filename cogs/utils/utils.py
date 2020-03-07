@@ -2,9 +2,12 @@ import asyncio
 import discord
 
 
-async def play_file(filename, message):
-    voice_channel = message.author.voice.channel
-    ctx = message.channel
+async def play_file(filename, message=None, channel=None):
+    if channel:
+        voice_channel = channel
+    else:
+        voice_channel = message.author.voice.channel
+        ctx = message.channel
     try:
         voice_channel = await voice_channel.connect()
         # catching most common errors that can occur while playing effects

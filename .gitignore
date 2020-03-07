@@ -1,4 +1,6 @@
 config.py
+420.mp3
+cogs/ImageTools.py
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

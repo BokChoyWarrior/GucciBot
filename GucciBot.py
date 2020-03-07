@@ -13,7 +13,7 @@ logger.addHandler(handler)
 
 
 prefix = config.prefix
-bot = commands.Bot(command_prefix=config["prefix"], description="Welcome to PradaBot!\nCommands are below:",
+bot = commands.Bot(command_prefix=config.prefix, description="Welcome to PradaBot!\nCommands are below:",
                    case_insensitive=True)
 
 initial_extensions = [
@@ -22,7 +22,8 @@ initial_extensions = [
     "Basics",
     "Replies",
     "Memevoting",
-    "MyCaptionBot"
+    "MyCaptionBot",
+    "Timer"
 ]
 
 
