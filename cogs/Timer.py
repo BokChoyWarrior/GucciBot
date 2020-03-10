@@ -25,15 +25,18 @@ class Timer(commands.Cog):
                             # myobj = gTTS(text="Oh look, it's that time again! 4:20 Blaze it!")
                             # myobj.save("420.mp3")
                             await utils.play_file("420.mp3", channel=voice_channel)
+                            await asyncio.sleep(0.4)
                             await utils.play_file("sounds/air horn.mp3", channel=voice_channel)
             else:
                 pass
             await asyncio.sleep(40)
 
-    @commands.command()
-    async def timer(self, ctx):
-        await ctx.send(f"Time is: {datetime.datetime.now()}")
-        # await utils.play_file("timerTTS.mp3", message=ctx)
+    # @commands.command()
+    # async def backslash(self, ctx):
+    #     myobj = gTTS(text="C: BACKSLASH! Users BACKSLASH! I7 4790k BACKSLASH! Desktop BACKSLASH! Workspace BACKSLASH! GucciBot BACKSLASH! venv BACKSLASH! lib BACKSLASH! site-packages BACKSLASH! websockets BACKSLASH! protocol.py BACKSLASH!", lang="fr")
+    #     myobj.save("backslash.mp3")
+    #     await utils.play_file("backslash.mp3", message=ctx)
+    #     # await utils.play_file("timerTTS.mp3", message=ctx)
 
 
 def setup(bot):
