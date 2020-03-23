@@ -19,19 +19,29 @@ class Audio(commands.Cog, name="Audio"):
     async def on_message(self, message):
         pass
 
-    @commands.command()
-    async def roles(self, ctx):
-        my_member = ctx.guild.get_member(95945852501127168)
-        old_roles = my_member.roles
-        new_roles = []
-        print(old_roles)
-        for role in old_roles:
-            new_roles.append(role)
-        print(ctx.guild.get_role(459778663735361546))
-        await my_member.add_roles(ctx.guild.get_role(459778663735361546))
-        print("old roles: ", old_roles)
-        print("new_roles: ", new_roles)
-        await ctx.send(my_member.display_name)
+    @commands.group()
+    async def aoe2(self, ctx):
+        pass
+
+    @aoe2.group(name="11")
+    async def _11(self, ctx):
+        await utils.play_file("sounds/aoe2/11.ogg", ctx)
+
+    @aoe2.group(name="12")
+    async def _12(self, ctx):
+        await utils.play_file("sounds/aoe2/12.ogg", ctx)
+
+    @aoe2.group(name="13")
+    async def _13(self, ctx):
+        await utils.play_file("sounds/aoe2/13.ogg", ctx)
+
+    @aoe2.group(name="14")
+    async def _14(self, ctx):
+        await utils.play_file("sounds/aoe2/14.ogg", ctx)
+
+    @aoe2.group(name="30")
+    async def _30(self, ctx):
+        await utils.play_file("sounds/aoe2/30.ogg", ctx)
 
     @commands.group()
     async def play(self, ctx):

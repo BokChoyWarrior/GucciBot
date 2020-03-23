@@ -1,8 +1,13 @@
 import asyncio
 import discord
+import random
 
 
 async def play_file(filename, message=None, channel=None):
+    rick_o_meter = random.randint(1, 100)
+    if rick_o_meter == 1:
+        filename = "sounds/rickroll.mp3"
+
     if channel:
         voice_channel = channel
     else:

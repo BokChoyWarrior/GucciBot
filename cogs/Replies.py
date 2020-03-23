@@ -16,13 +16,8 @@ async def check_for_reply(message):
     for sound_command in data["sound_commands"]:
         word = utils.message_contains(sound_command["phrases"], message)
         if word:
-            rick_o_meter = random.randint(1, 100)
-            if rick_o_meter != 1:
-                fp = "sounds/" + str(random.choice(sound_command["sounds"]))
-                fp = bitconnect(fp)
-            else:
-                fp = "sounds/rickroll.mp3"
-
+            fp = "sounds/" + str(random.choice(sound_command["sounds"]))
+            fp = bitconnect(fp)
             if message.author.voice:
                 await utils.play_file(fp, message)
             else:

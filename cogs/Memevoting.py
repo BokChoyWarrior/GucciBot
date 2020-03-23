@@ -35,6 +35,21 @@ class Memevoting(commands.Cog):
         await self.bot.wait_until_ready()
         await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
         while not self.bot.is_closed():
+            self.current_scan = datetime.now()
+            if timedelta(2) < self.current_scan - self.prev_scan < timedelta(7):
+                for memechannel_id in self.memechannel_ids:
+                    for member in self.bot.get_channel(memechannel_id).members:
+                        for meme_loser_role in self.meme_loser_roles:
+                            try:
+                                await member.remove_roles(member.guild.get_role(meme_loser_role))
+                            except AttributeError:
+                                pass
+                        for meme_winner_role in self.meme_winner_roles:
+                            try:
+                                await member.remove_roles(member.guild.get_role(meme_winner_role))
+                            except AttributeError:
+                                pass
+
             if self.current_scan - self.prev_scan > timedelta(7):
                 print("Scanning...")
                 for memechannel_id in self.memechannel_ids:
@@ -45,7 +60,7 @@ class Memevoting(commands.Cog):
                     self.data["last_scan"] = self.prev_scan.isoformat()
                     json.dump(self.data, f, indent=2)
 
-            await asyncio.sleep(3600)
+            await asyncio.sleep(1800)
 
     @commands.Cog.listener()
     async def on_message(self, message):
@@ -82,7 +97,7 @@ class Memevoting(commands.Cog):
                 await memechannel.send(embed=embed)
 
                 member = winners_message.author
-                if not member in winner_members:
+                if not member in winner_members and not member in loser_members:
                     for meme_winner_role in self.meme_winner_roles:
                         try:
                             await member.add_roles(member.guild.get_role(meme_winner_role))

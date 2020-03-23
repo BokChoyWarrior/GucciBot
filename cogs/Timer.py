@@ -31,12 +31,11 @@ class Timer(commands.Cog):
                 pass
             await asyncio.sleep(40)
 
-    # @commands.command()
-    # async def backslash(self, ctx):
-    #     myobj = gTTS(text="C: BACKSLASH! Users BACKSLASH! I7 4790k BACKSLASH! Desktop BACKSLASH! Workspace BACKSLASH! GucciBot BACKSLASH! venv BACKSLASH! lib BACKSLASH! site-packages BACKSLASH! websockets BACKSLASH! protocol.py BACKSLASH!", lang="fr")
-    #     myobj.save("backslash.mp3")
-    #     await utils.play_file("backslash.mp3", message=ctx)
-    #     # await utils.play_file("timerTTS.mp3", message=ctx)
+    @commands.command()
+    async def say(self, ctx, text, lang="en"):
+        gttsobj = gTTS(text=text, lang=lang, slow=False)
+        gttsobj.save("sounds/say.mp3")
+        await utils.play_file("sounds/say.mp3", message=ctx)
 
 
 def setup(bot):

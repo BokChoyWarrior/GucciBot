@@ -23,7 +23,8 @@ initial_extensions = [
     "Replies",
     "Memevoting",
     "MyCaptionBot",
-    "Timer"
+    "Timer",
+    "ImageTools"
 ]
 
 
