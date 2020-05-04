@@ -29,7 +29,7 @@ class Timer(commands.Cog):
                             await utils.play_file("sounds/air horn.mp3", channel=voice_channel)
             else:
                 pass
-            await asyncio.sleep(40)
+            await asyncio.sleep(60)
 
     @commands.command()
     async def say(self, ctx, text, lang="en"):

@@ -51,7 +51,7 @@ class Memevoting(commands.Cog):
                                 pass
 
             if self.current_scan - self.prev_scan > timedelta(7):
-                print("Scanning...")
+                print("Scanning...", self.current_scan-self.prev_scan)
                 for memechannel_id in self.memechannel_ids:
                     await self.get_meme_contest_results(memechannel_id, self.prev_scan)
                 self.prev_scan += timedelta(7)

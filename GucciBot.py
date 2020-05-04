@@ -4,6 +4,7 @@ from discord.ext import commands
 import discord
 import logging
 import config
+from cogs.utils import db
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)

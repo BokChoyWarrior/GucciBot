@@ -20,9 +20,9 @@ async def check_for_reply(message):
             fp = bitconnect(fp)
             if message.author.voice:
                 await utils.play_file(fp, message)
-            else:
-                f = discord.File(fp, filename=fp)
-                await message.author.send(content="", tts=False, embed=None, file=f, files=None, nonce=None)
+            # else:
+            #     f = discord.File(fp, filename=fp)
+            #     await message.author.send(content="", tts=False, embed=None, file=f, files=None, nonce=None)
 
     for reply_command in data["reply_commands"]:
         word = utils.message_contains(reply_command["phrases"], message)
