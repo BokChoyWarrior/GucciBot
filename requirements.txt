@@ -10,8 +10,13 @@ cffi==1.13.1
 chardet==3.0.4
 constantly==15.1.0
 discord==1.0.1
+<<<<<<< HEAD
 discord.py==1.4.1
 Django==3.0.1
+=======
+discord.py==1.2.5
+Django==3.0.7
+>>>>>>> 61ea40ac816ba0c4d0638900fcf46d39757574e9
 heroku==0.1.4
 humanize==0.5.1
 hyperlink==19.0.0
