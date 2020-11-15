@@ -1,5 +1,5 @@
 import asyncio
-import datetime
+import datetime as dt
 import json
 import discord
 from discord.ext import commands
@@ -8,7 +8,7 @@ from discord.ext import commands
 class Memevoting(commands.Cog):
 
     def __init__(self, bot):
-        self.current_scan = datetime.datetime.now()
+        self.current_scan = dt.datetime.now()
         self.bot = bot
         self.name = "Memevoting"
         self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
@@ -21,7 +21,7 @@ class Memevoting(commands.Cog):
             self.memechannel_ids = self.data["memechannel_ids"]
             self.meme_winner_roles = self.data["meme_winner_roles"]
             self.meme_loser_roles = self.data["meme_loser_roles"]
-            self.prev_scan = datetime.fromisoformat(self.data["last_scan"])
+            self.prev_scan = dt.datetime.fromisoformat(self.data["last_scan"])
 
             for memechannel_id in self.memechannel_ids:
                 memechannel = self.bot.get_channel(memechannel_id)
@@ -35,8 +35,8 @@ class Memevoting(commands.Cog):
         await self.bot.wait_until_ready()
         await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
         while not self.bot.is_closed():
-            self.current_scan = datetime.datetime.now()
-            if datetime.timedelta(2) < self.current_scan - self.prev_scan < datetime.timedelta(7):
+            self.current_scan = dt.datetime.now()
+            if dt.datetime.timedelta(2) < self.current_scan - self.prev_scan < dt.datetime.timedelta(7):
                 for memechannel_id in self.memechannel_ids:
                     for member in self.bot.get_channel(memechannel_id).members:
                         for meme_loser_role in self.meme_loser_roles:
@@ -50,11 +50,11 @@ class Memevoting(commands.Cog):
                             except AttributeError:
                                 pass
 
-            if self.current_scan - self.prev_scan > datetime.timedelta(7):
+            if self.current_scan - self.prev_scan > dt.datetime.timedelta(7):
                 print("Scanning...", self.current_scan - self.prev_scan)
                 for memechannel_id in self.memechannel_ids:
                     await self.get_meme_contest_results(memechannel_id, self.prev_scan)
-                self.prev_scan += datetime.timedelta(7)
+                self.prev_scan += dt.datetime.timedelta(7)
                 with open("cogs/cogfigs/Memevoting.json", "w+") as f:
                     self.data["memechannel_ids"] = self.memechannel_ids
                     self.data["last_scan"] = self.prev_scan.isoformat()
@@ -145,7 +145,7 @@ async def get_winner_embed(winner, bot_avatar_url, winners):
         head_title = "\U0001f923 This week's UlTiMaTe meme! \U0001f923"
 
     embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
-                          timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
+                          timestamp=dt.datetime.now(tz=dt.timezone.utc))
     embed.set_thumbnail(url=winner.author.avatar_url)
     embed.set_footer(text="GucciBot", icon_url=bot_avatar_url)
 
@@ -171,7 +171,7 @@ async def get_loser_embed(loser, bot_avatar_url, losers):
         head_title = "\U0001F4A9 This week's ShItTeSt meme! \U0001F4A9"
 
     embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
-                          timestamp=datetime.datetime.now(tz=datetime.timezone.utc))
+                          timestamp=dt.datetime.now(tz=dt.timezone.utc))
     embed.set_thumbnail(url=loser.author.avatar_url)
     embed.set_footer(text="GucciBot", icon_url=bot_avatar_url)
 
