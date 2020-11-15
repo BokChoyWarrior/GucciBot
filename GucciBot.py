@@ -12,9 +12,8 @@ handler = logging.FileHandler(filename='GucciBot.log', encoding='utf-8', mode='w
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
-
 prefix = config.prefix
-bot = commands.Bot(command_prefix=config.prefix, description="Welcome to PradaBot!\nCommands are below:",
+bot = commands.Bot(command_prefix=config.prefix, description="Welcome to GucciBot!\nCommands are below:",
                    case_insensitive=True)
 
 initial_extensions = [
@@ -25,7 +24,9 @@ initial_extensions = [
     "Memevoting",
     "MyCaptionBot",
     "Timer",
-    "ImageTools"
+    "ImageTools",
+    "Configs",
+    # "Basics2"
 ]
 
 

@@ -13,16 +13,17 @@ async def check_for_reply(message):
     except FileNotFoundError as e:
         print(e, "file path is:", fp, sep=" ")
 
-    for sound_command in data["sound_commands"]:
-        word = utils.message_contains(sound_command["phrases"], message)
-        if word:
-            fp = "sounds/" + str(random.choice(sound_command["sounds"]))
-            fp = bitconnect(fp)
-            if message.author.voice:
-                await utils.play_file(fp, message)
-            # else:
-            #     f = discord.File(fp, filename=fp)
-            #     await message.author.send(content="", tts=False, embed=None, file=f, files=None, nonce=None)
+    # for sound_command in data["sound_commands"]:
+    #     word = utils.message_contains(sound_command["phrases"], message)
+    #     if word:
+    #         fp = "sounds/" + str(random.choice(sound_command["sounds"]))
+    #         fp = bitconnect(fp)
+    #         if message.author.voice:
+    #             await utils.play_file(fp, message)
+    #             break
+    #         # else:
+    #         #     f = discord.File(fp, filename=fp)
+    #         #     await message.author.send(content="", tts=False, embed=None, file=f, files=None, nonce=None)
 
     for reply_command in data["reply_commands"]:
         word = utils.message_contains(reply_command["phrases"], message)

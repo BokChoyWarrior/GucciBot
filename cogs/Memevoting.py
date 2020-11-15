@@ -126,7 +126,7 @@ async def get_reaction_results(messages, emoji):
 
     for message in messages:
         for reaction in message.reactions:
-            if reaction.emoji == emoji:  # :thumbsup: or :thumbsdown:
+            if reaction.emoji == emoji and reaction.count > 1:  # :thumbsup: or :thumbsdown:
                 if not results:
                     results.append(message)
                     max_reactions = reaction.count

@@ -1,8 +1,13 @@
+images/
 config.py
 420.mp3
 cogs/ImageTools.py
 cogs/utils/db.py
 backslash.mp3
+*.png
+*.jpg
+*.jpeg
+*.mp3
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

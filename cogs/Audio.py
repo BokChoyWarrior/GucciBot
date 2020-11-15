@@ -1,3 +1,5 @@
+import random
+
 from discord import Role
 
 from .utils import utils
@@ -19,6 +21,7 @@ class Audio(commands.Cog, name="Audio"):
     async def on_message(self, message):
         pass
 
+    """ AOE2 sounds """
     @commands.group()
     async def aoe2(self, ctx):
         pass
@@ -43,6 +46,7 @@ class Audio(commands.Cog, name="Audio"):
     async def _30(self, ctx):
         await utils.play_file("sounds/aoe2/30.ogg", ctx)
 
+    """ PLAY commands"""
     @commands.group()
     async def play(self, ctx):
         pass
@@ -82,6 +86,12 @@ class Audio(commands.Cog, name="Audio"):
     @play.group(name="1811")
     async def _1811(self, ctx):
         await utils.play_file("sounds/stop inviting me to dota.mp3", ctx)
+
+    @play.group(name="btc")
+    async def _btc(self, ctx):
+        btc = random.randint(0, 41)
+        sound_path = f"sounds/bitconnect/Bitconnect{btc}.mp3"
+        await utils.play_file(sound_path, ctx)
 
 
 def setup(bot):

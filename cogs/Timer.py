@@ -27,15 +27,18 @@ class Timer(commands.Cog):
                             await utils.play_file("420.mp3", channel=voice_channel)
                             await asyncio.sleep(0.4)
                             await utils.play_file("sounds/air horn.mp3", channel=voice_channel)
-            else:
-                pass
-            await asyncio.sleep(60)
+                await asyncio.sleep(60)
+            await asyncio.sleep(30)
 
     @commands.command()
     async def say(self, ctx, text, lang="en"):
-        gttsobj = gTTS(text=text, lang=lang, slow=False)
-        gttsobj.save("sounds/say.mp3")
-        await utils.play_file("sounds/say.mp3", message=ctx)
+        if ctx.message.author.voice is not None:
+            gttsobj = gTTS(text=text, lang=lang, slow=False)
+            gttsobj.save("sounds/say.mp3")
+            await utils.play_file("sounds/say.mp3", message=ctx)
+        else:
+            print("User not in voice channel")
+            await ctx.send(content="Please join a voice channel to use this command.", delete_after=10)
 
 
 def setup(bot):

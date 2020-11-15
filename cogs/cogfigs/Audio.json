@@ -119,6 +119,11 @@
       "sounds":["Duolingo.mp3", "Duolingo Italian.mp3"]
     },
     {
+      "name": "hamburger",
+      "phrases": ["burger"],
+      "sounds":["Hamburger.mp3"]
+    },
+    {
       "name": "spanish",
       "phrases": ["spanish", "spain", "espanol", "mexico", "mexican"],
       "sounds": ["Duolingo.mp3"]
