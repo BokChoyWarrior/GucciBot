@@ -21,7 +21,7 @@ class Memevoting(commands.Cog):
             self.memechannel_ids = self.data["memechannel_ids"]
             self.meme_winner_roles = self.data["meme_winner_roles"]
             self.meme_loser_roles = self.data["meme_loser_roles"]
-            self.prev_scan = dt.datetime.fromisoformat(self.data["last_scan"])
+            self.prev_scan = dt.fromisoformat(self.data["last_scan"])
 
             for memechannel_id in self.memechannel_ids:
                 memechannel = self.bot.get_channel(memechannel_id)
