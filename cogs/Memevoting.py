@@ -36,7 +36,7 @@ class Memevoting(commands.Cog):
         await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.now()
-            if dt.datetime.timedelta(2) < self.current_scan - self.prev_scan < dt.datetime.timedelta(7):
+            if dt.timedelta(2) < self.current_scan - self.prev_scan < dt.timedelta(7):
                 for memechannel_id in self.memechannel_ids:
                     for member in self.bot.get_channel(memechannel_id).members:
                         for meme_loser_role in self.meme_loser_roles:
@@ -50,11 +50,11 @@ class Memevoting(commands.Cog):
                             except AttributeError:
                                 pass
 
-            if self.current_scan - self.prev_scan > dt.datetime.timedelta(7):
+            if self.current_scan - self.prev_scan > dt.timedelta(7):
                 print("Scanning...", self.current_scan - self.prev_scan)
                 for memechannel_id in self.memechannel_ids:
                     await self.get_meme_contest_results(memechannel_id, self.prev_scan)
-                self.prev_scan += dt.datetime.timedelta(7)
+                self.prev_scan += dt.timedelta(7)
                 with open("cogs/cogfigs/Memevoting.json", "w+") as f:
                     self.data["memechannel_ids"] = self.memechannel_ids
                     self.data["last_scan"] = self.prev_scan.isoformat()

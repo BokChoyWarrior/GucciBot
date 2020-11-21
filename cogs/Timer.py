@@ -1,5 +1,6 @@
 import asyncio
 import datetime
+import os.path
 
 from gtts import gTTS
 from discord.ext import commands
@@ -22,8 +23,9 @@ class Timer(commands.Cog):
                 for guild in self.bot.guilds:
                     for voice_channel in guild.voice_channels:
                         if len(voice_channel.members) > 0:
-                            # myobj = gTTS(text="Oh look, it's that time again! 4:20 Blaze it!")
-                            # myobj.save("420.mp3")
+                            if not os.path.isfile("420.mp3"):
+                                myobj = gTTS(text="Oh look, it's that time again! 4:20 Blaze it!")
+                                myobj.save("420.mp3")
                             await utils.play_file("420.mp3", channel=voice_channel)
                             await asyncio.sleep(0.4)
                             await utils.play_file("sounds/air horn.mp3", channel=voice_channel)
