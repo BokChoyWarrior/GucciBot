@@ -5,6 +5,12 @@
       "memeresultchannel_id": 779658905021710336,
       "meme_winner_role_id": 669282415310798868,
       "meme_loser_role_id": 668798124751323146
+    },
+    "427519501949730826": {
+      "memechannel_id": 666741559126917161,
+      "memeresultchannel_id": 779865274186596369,
+      "meme_winner_role_id": 0,
+      "meme_loser_role_id": 0
     }
   },
   "last_scan": "2020-11-20T18:00:00"

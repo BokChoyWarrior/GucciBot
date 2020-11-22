@@ -64,7 +64,8 @@ class Memevoting(commands.Cog):
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
-        if str(message.channel.id) == self.guild_ids[str(message.guild.id)]["memechannel_id"] and message.author != self.bot.user:
+        if str(message.channel.id) == str(self.guild_ids[str(message.guild.id)]["memechannel_id"]) and message.author != self.bot.user:
+
             await self.react_to_message(message)
 
     async def get_result_embed(self, participant_msg, winner_or_loser, emoji=""):
