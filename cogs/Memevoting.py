@@ -8,55 +8,53 @@ from discord.ext import commands
 class Memevoting(commands.Cog):
 
     def __init__(self, bot):
-        self.current_scan = dt.datetime.now()
+        # Below is a sample of the current storage format of the meme channels and such for each guild.
+        # This should be migrated to a database at some point...
+
+        # {
+        #     "guild_ids": {
+        #         "95947555887652864": {
+        #             "memechannel_id": 668470137975865344,
+        #             "memeresultchannel_id": 779658905021710336,
+        #             "meme_winner_role_id": 669282415310798868,
+        #             "meme_loser_role_id": 668798124751323146
+        #         }
+        #     },
+        #     "last_scan": "2020-11-20T18:00:00"
+        # }
+
         self.bot = bot
         self.name = "Memevoting"
+        with open("cogs/cogfigs/Memevoting.json", "r+") as f:
+            self.data = json.load(f)
+        self.guild_ids = self.data["guild_ids"]
+        self.prev_scan = dt.datetime.fromisoformat(self.data["last_scan"])
+        self.current_scan = dt.datetime.now()
         self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
 
     @commands.Cog.listener()
     async def on_ready(self):
-
-        with open("cogs/cogfigs/Memevoting.json", "r+") as f:
-            self.data = json.load(f)
-            self.memechannel_ids = self.data["memechannel_ids"]
-            self.meme_winner_roles = self.data["meme_winner_roles"]
-            self.meme_loser_roles = self.data["meme_loser_roles"]
-            self.prev_scan = dt.datetime.fromisoformat(self.data["last_scan"])
-
-            for memechannel_id in self.memechannel_ids:
-                memechannel = self.bot.get_channel(memechannel_id)
-                messages = await memechannel.history(after=self.prev_scan).flatten()
-
-                for message in messages:
-                    if not message.author == self.bot.user:
-                        await react_to_messages(message)
+        for guild_id in self.guild_ids:
+            memechannel = self.bot.get_channel(self.guild_ids[guild_id]["memechannel_id"])
+            messages = await memechannel.history(after=self.prev_scan).flatten()
+            for message in messages:
+                if not message.author == self.bot.user:
+                    await self.react_to_message(message)
 
     async def meme_contest_bg_task(self):
         await self.bot.wait_until_ready()
-        await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
+        # await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
+        # ( testing disabling this, shouldn't be needed if logic is logical )
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.now()
             if dt.timedelta(2) < self.current_scan - self.prev_scan < dt.timedelta(7):
-                for memechannel_id in self.memechannel_ids:
-                    for member in self.bot.get_channel(memechannel_id).members:
-                        for meme_loser_role in self.meme_loser_roles:
-                            try:
-                                await member.remove_roles(member.guild.get_role(meme_loser_role))
-                            except AttributeError:
-                                pass
-                        for meme_winner_role in self.meme_winner_roles:
-                            try:
-                                await member.remove_roles(member.guild.get_role(meme_winner_role))
-                            except AttributeError:
-                                pass
+                await self.remove_meme_roles()  # make this function find guild
 
             if self.current_scan - self.prev_scan > dt.timedelta(7):
                 print("Scanning...", self.current_scan - self.prev_scan)
-                for memechannel_id in self.memechannel_ids:
-                    await self.get_meme_contest_results(memechannel_id, self.prev_scan)
+                await self.get_meme_contest_results()
                 self.prev_scan += dt.timedelta(7)
                 with open("cogs/cogfigs/Memevoting.json", "w+") as f:
-                    self.data["memechannel_ids"] = self.memechannel_ids
                     self.data["last_scan"] = self.prev_scan.isoformat()
                     json.dump(self.data, f, indent=2)
 
@@ -66,129 +64,122 @@ class Memevoting(commands.Cog):
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
+        if str(message.channel.id) == self.guild_ids[str(message.guild.id)]["memechannel_id"] and message.author != self.bot.user:
+            await self.react_to_message(message)
 
-        if message.channel.id in self.memechannel_ids and message.author != self.bot.user:
-            await react_to_messages(message)
+    async def get_result_embed(self, participant_msg, winner_or_loser, emoji=""):
+        if winner_or_loser == "winner":
+            head_title = "\U0001f923 This week's UlTiMaTe memes! \U0001f923"
+            congrats_message = "Sent by memelord: "
+        elif winner_or_loser == "loser":
+            head_title = "\U0001F4A9 This week's ShItTeSt memes! \U0001F4A9"
+            congrats_message = "Sent by boring loser: "
 
-    async def get_meme_contest_results(self, memechannel_id, prev_scan):
+        embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
+                              timestamp=dt.datetime.now(tz=dt.timezone.utc),
+                              description=f"**[Link to message]({participant_msg.jump_url})**")
+        embed.set_thumbnail(url=participant_msg.author.avatar_url)
+        embed.set_footer(text="GucciBot", icon_url=self.bot.user.avatar_url)
 
-        memechannel = self.bot.get_channel(memechannel_id)
-        messages = await memechannel.history(after=prev_scan).flatten()
-        if messages:
-            winners_messages = await get_reaction_results(messages, "\U0001f44d")
-            losers_messages = await get_reaction_results(messages, "\U0001f44e")
+        if not participant_msg.attachments:
+            main_content = participant_msg.content
+        else:
+            attachment = participant_msg.attachments[0]
+            if (attachment.filename.endswith(".jpg") or attachment.filename.endswith(".jpeg") or
+                    attachment.filename.endswith(".png")):
+                embed.set_image(url=attachment.url)
+            main_content = f"[{attachment.filename}]({attachment.url})"
+
+        embed.add_field(name=main_content, value=f"**{congrats_message}{participant_msg.author.display_name}!**")
+        return embed
+
+    async def get_meme_contest_results(self):
+        for guild_id in self.guild_ids:
+            guild = self.bot.get_guild(int(guild_id))
+            meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
+            meme_winner_role = guild.get_role(int(self.guild_ids[guild_id]["meme_winner_role_id"]))
+            memechannel = guild.get_channel(int(self.guild_ids[guild_id]["memechannel_id"]))
+            memeresultchannel = guild.get_channel(int(self.guild_ids[guild_id]["memeresultchannel_id"]))
+            messages = await memechannel.history(after=self.prev_scan).flatten()
+            if not messages:
+                return
+            winners_messages, upvotes = await self.get_reaction_results(messages, "\U0001f44d")
+            losers_messages, downvotes = await self.get_reaction_results(messages, "\U0001f44e")
 
             loser_members = []
             for losers_message in losers_messages:
-                embed = await get_loser_embed(losers_message, self.bot.user.avatar_url, losers_messages)
-                await memechannel.send(embed=embed)
+                embed = await self.get_result_embed(losers_message, winner_or_loser="loser", emoji="\U0001f44e")
+                # await memechannel.send(content=f"**\U0001f44e {downvotes}**", embed=embed)
                 member = losers_message.author
                 if member not in loser_members:
-                    for meme_loser_role in self.meme_loser_roles:
-                        try:
-                            await member.add_roles(member.guild.get_role(meme_loser_role))
-                        except AttributeError:
-                            pass
                     loser_members.append(member)
+                    try:
+                        await member.add_roles(meme_loser_role, reason="meme contest")
+                    except discord.Forbidden as e:
+                        print(e + " - You do not have permission to add these roles.")
+                    except discord.HTTPException as e:
+                        print(e)
 
-            winner_members = []
             for winners_message in winners_messages:
-                embed = await get_winner_embed(winners_message, self.bot.user.avatar_url, winners_messages)
-                await memechannel.send(embed=embed)
-
+                embed = await self.get_result_embed(winners_message, winner_or_loser="winner", emoji="\U0001f44d")
+                await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
                 member = winners_message.author
-                if not (member in winner_members or member in loser_members):
-                    for meme_winner_role in self.meme_winner_roles:
-                        try:
-                            await member.add_roles(member.guild.get_role(meme_winner_role))
-                        except AttributeError:
-                            pass
+                if member in loser_members:  # member can't be winner AND loser!
+                    try:
+                        await member.add_roles(meme_winner_role, reason="meme contest")
+                    except discord.Forbidden as e:
+                        print(e + " - You do not have permission to add these roles.")
+                    except discord.HTTPException as e:
+                        print(e)
 
-                    winner_members.append(member)
+    async def get_guild(self, guild_id):
+        return self.bot.get_guild(guild_id)
 
+    async def remove_meme_roles(self):
+        for guild_id in self.guild_ids:
+            guild = self.bot.get_guild(guild_id)
+            meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
+            meme_winner_role = guild.get_role(int(self.guild_ids[guild_id]["meme_winner_role_id"]))
+            memechannel = guild.get_channel(int(self.guild_ids[guild_id]["memechannel_id"]))
 
-async def react_to_messages(message):
-    try:
-        await message.add_reaction("\U0001f44d")
-        await asyncio.sleep(0.3)
-        await message.add_reaction("\U0001f44e")
-        await asyncio.sleep(0.3)
-    except discord.errors.NotFound:
-        print("Message was deleted before we could react!")
+            for member in memechannel.members:
+                try:
+                    await member.remove_roles(meme_loser_role, meme_winner_role, reason="Meme contest")
+                except discord.Forbidden:
+                    pass
+                except discord.HTTPException:
+                    pass
 
+    @staticmethod
+    async def react_to_message(message):
+        try:
+            await message.add_reaction("\U0001f44d")
+            await asyncio.sleep(0.3)
+            await message.add_reaction("\U0001f44e")
+            await asyncio.sleep(0.3)
+        except discord.errors.NotFound:
+            print("Message was deleted before we could react!")
 
-async def get_reaction_results(messages, emoji):
-    """
-        When given a list of :Class: Message and an emoji, will return a list of messages with the most emoji reactions
-    """
-    max_reactions = 0
-    results = []
+    @staticmethod
+    async def get_reaction_results(messages, emoji):
+        """
+            When given a list of :Class: Message and an emoji, will return a list of messages with the most emoji reactions
+        """
+        max_reactions = 0
+        results = []
 
-    for message in messages:
-        for reaction in message.reactions:
-            if reaction.emoji == emoji and reaction.count > 1:  # :thumbsup: or :thumbsdown:
-                if not results:
-                    results.append(message)
-                    max_reactions = reaction.count
-                elif reaction.count > max_reactions:
-                    results = [message]
-                    max_reactions = reaction.count
-                elif max_reactions == reaction.count:
-                    results.append(message)
-    return results
-
-
-async def get_winner_embed(winner, bot_avatar_url, winners):
-    if len(winners) > 1:
-        head_title = "\U0001f923 Weekly best memes! \U0001f923"
-    else:
-        head_title = "\U0001f923 This week's UlTiMaTe meme! \U0001f923"
-
-    embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
-                          timestamp=dt.datetime.now(tz=dt.timezone.utc))
-    embed.set_thumbnail(url=winner.author.avatar_url)
-    embed.set_footer(text="GucciBot", icon_url=bot_avatar_url)
-
-    if winner.attachments:
-        content = winner.attachments[0].url
-    else:
-        content = winner.content
-    if content.startswith("http"):
-        embed.set_image(url=content)
-        content_value = f"[Link]({content})"
-    else:
-        content_value = content
-        pass
-    embed.add_field(name=f"**Sent by memelord {winner.author.display_name}!**", value=content_value)
-
-    return embed
-
-
-async def get_loser_embed(loser, bot_avatar_url, losers):
-    if len(losers) > 1:
-        head_title = "\U0001F4A9 Weekly worst memes! \U0001F4A9"
-    else:
-        head_title = "\U0001F4A9 This week's ShItTeSt meme! \U0001F4A9"
-
-    embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
-                          timestamp=dt.datetime.now(tz=dt.timezone.utc))
-    embed.set_thumbnail(url=loser.author.avatar_url)
-    embed.set_footer(text="GucciBot", icon_url=bot_avatar_url)
-
-    if loser.attachments:
-        content = loser.attachments[0].url
-    else:
-        content = loser.content
-    if content.startswith("http"):
-        embed.set_image(url=content)
-        content_value = f"[Link]({content})"
-    else:
-        content_value = content
-        pass
-    embed.add_field(name=f"**Sent by boring loser {loser.author.display_name}!**", value=content_value)
-
-    return embed
-
+        for message in messages:
+            for reaction in message.reactions:
+                if reaction.emoji == emoji and reaction.count > 1:  # :thumbsup: or :thumbsdown:
+                    if not results:
+                        results.append(message)
+                        max_reactions = reaction.count
+                    elif reaction.count > max_reactions:
+                        results = [message]
+                        max_reactions = reaction.count
+                    elif max_reactions == reaction.count:
+                        results.append(message)
+        return results, max_reactions - 1
 
 def setup(bot):
     bot.add_cog(Memevoting(bot))
