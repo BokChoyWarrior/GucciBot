@@ -19,7 +19,7 @@ async def check_for_reply(message):
     #         fp = "sounds/" + str(random.choice(sound_command["sounds"]))
     #         fp = bitconnect(fp)
     #         if message.author.voice:
-    #             await utils.play_file(fp, message)
+    #             await utils.play_files(fp, message)
     #             break
     #         # else:
     #         #     f = discord.File(fp, filename=fp)
