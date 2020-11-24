@@ -18,7 +18,7 @@ class Timer(commands.Cog):
     async def timer_bg_task(self):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
-            current_time = datetime.datetime.now()
+            current_time = datetime.datetime.utcnow()
             if (current_time.hour == 16 or current_time.hour == 4) and current_time.minute == 20:
                 for guild in self.bot.guilds:
                     for voice_channel in guild.voice_channels:
@@ -29,8 +29,9 @@ class Timer(commands.Cog):
                             await utils.play_file("420.mp3", channel=voice_channel)
                             await asyncio.sleep(0.4)
                             await utils.play_file("sounds/air horn.mp3", channel=voice_channel)
-                await asyncio.sleep(60)
-            await asyncio.sleep(30)
+                print("sleeping")
+                await asyncio.sleep(30)
+            await asyncio.sleep(3600)
 
     @commands.command()
     async def say(self, ctx, text, lang="en"):

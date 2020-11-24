@@ -12,9 +12,12 @@ handler = logging.FileHandler(filename='GucciBot.log', encoding='utf-8', mode='w
 handler.setFormatter(logging.Formatter('%(asctime)s:%(levelname)s:%(name)s: %(message)s'))
 logger.addHandler(handler)
 
+intents = discord.Intents.all()
+intents.presences = False
+
 prefix = config.prefix
 bot = commands.Bot(command_prefix=config.prefix, description="Welcome to GucciBot!\nCommands are below:",
-                   case_insensitive=True)
+                   case_insensitive=True, intents=intents)
 
 initial_extensions = [
     'Fun',

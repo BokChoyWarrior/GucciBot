@@ -133,23 +133,30 @@ class Memevoting(commands.Cog):
                     except discord.HTTPException as e:
                         print(e)
 
-    async def get_guild(self, guild_id):
-        return self.bot.get_guild(guild_id)
-
     async def remove_meme_roles(self):
         for guild_id in self.guild_ids:
-            guild = self.bot.get_guild(guild_id)
+            guild = self.bot.get_guild(int(guild_id))
+
+            valid_roles = []
             meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
+            if meme_loser_role:
+                valid_roles.append(meme_loser_role)
             meme_winner_role = guild.get_role(int(self.guild_ids[guild_id]["meme_winner_role_id"]))
+            if meme_winner_role:
+                valid_roles.append(meme_winner_role)
             memechannel = guild.get_channel(int(self.guild_ids[guild_id]["memechannel_id"]))
 
+            if not len(valid_roles) > 0:
+                continue
+
             for member in memechannel.members:
-                try:
-                    await member.remove_roles(meme_loser_role, meme_winner_role, reason="Meme contest")
-                except discord.Forbidden:
-                    pass
-                except discord.HTTPException:
-                    pass
+                for role in valid_roles:
+                    try:
+                        await member.remove_role(role, reason="Meme contest")
+                    except discord.Forbidden:
+                        pass
+                    except discord.HTTPException:
+                        pass
 
     @staticmethod
     async def react_to_message(message):

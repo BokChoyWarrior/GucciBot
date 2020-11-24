@@ -13,7 +13,6 @@ def channel_is_serious(givenchannelid, data=None):
         except FileNotFoundError as e:
             print(e, "file path is:", fp, sep=" ")
     for channelId in data["channelIds"]:
-        print(channelId)
         if givenchannelid == channelId:
             return True
     return False
