@@ -8,6 +8,12 @@
     },
     "427519501949730826": {
       "memechannel_id": 666741559126917161,
+      "memeresultchannel_id": 399269101333381130,
+      "meme_winner_role_id": 0,
+      "meme_loser_role_id": 0
+    },
+    "378734861948813312": {
+      "memechannel_id": 399269101333381130,
       "memeresultchannel_id": 779865274186596369,
       "meme_winner_role_id": 0,
       "meme_loser_role_id": 0
