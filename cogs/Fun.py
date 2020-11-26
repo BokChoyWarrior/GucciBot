@@ -43,7 +43,10 @@ class Fun(commands.Cog):
         await ctx.message.delete()
         await ctx.send(my_message)
 
-		
+    @commands.command()
+    async def bunker(self, ctx):
+        await ctx.send("https://tech4thewin.com/wp-content/uploads/2020/08/9037547777323607125.jpg")
+
     async def rename_all_members(self, guild_id, name):
         for member in self.bot.get_guild(guild_id).members:
             await asyncio.sleep(1)
