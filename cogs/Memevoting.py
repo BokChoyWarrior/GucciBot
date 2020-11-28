@@ -64,8 +64,8 @@ class Memevoting(commands.Cog):
     async def on_message(self, message):
         if message.author == self.bot.user:
             return
-        if str(message.channel.id) == str(self.guild_ids[str(message.guild.id)]["memechannel_id"]) and message.author != self.bot.user:
-
+        if str(message.channel.id) == str(
+                self.guild_ids[str(message.guild.id)]["memechannel_id"]) and message.author != self.bot.user:
             await self.react_to_message(message)
 
     async def get_result_embed(self, participant_msg, winner_or_loser, emoji=""):
@@ -123,7 +123,7 @@ class Memevoting(commands.Cog):
 
             for winners_message in winners_messages:
                 embed = await self.get_result_embed(winners_message, winner_or_loser="winner", emoji="\U0001f44d")
-                if not isinstance(memeresultchannel, None):  # clean this up
+                if not memeresultchannel is None:  # clean this up
                     await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
                 member = winners_message.author
                 if member in loser_members:  # member can't be winner AND loser!
@@ -189,6 +189,7 @@ class Memevoting(commands.Cog):
                     elif max_reactions == reaction.count:
                         results.append(message)
         return results, max_reactions - 1
+
 
 def setup(bot):
     bot.add_cog(Memevoting(bot))
