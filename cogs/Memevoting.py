@@ -174,20 +174,16 @@ class Memevoting(commands.Cog):
         """
             When given a list of :Class: Message and an emoji, will return a list of messages with the most emoji reactions
         """
-        max_reactions = 0
+        max_reactions = 1
         results = []
 
         for message in messages:
             for reaction in message.reactions:
-                if reaction.emoji == emoji and reaction.count > 1:  # :thumbsup: or :thumbsdown:
-                    if not results:
-                        results.append(message)
-                        max_reactions = reaction.count
-                    elif reaction.count > max_reactions:
+                if reaction.emoji == emoji and reaction.count > 1 and reaction.count >= max_reactions:  # :thumbsup: or :thumbsdown:
+                    results.append(message)
+                    if reaction.count > max_reactions:
                         results = [message]
-                        max_reactions = reaction.count
-                    elif max_reactions == reaction.count:
-                        results.append(message)
+                    max_reactions = reaction.count
         return results, max_reactions - 1
 
 
