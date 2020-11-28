@@ -29,7 +29,7 @@ class Memevoting(commands.Cog):
             self.data = json.load(f)
         self.guild_ids = self.data["guild_ids"]
         self.prev_scan = dt.datetime.fromisoformat(self.data["last_scan"])
-        self.current_scan = dt.datetime.now()
+        self.current_scan = dt.datetime.utcnow()
         self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
 
     @commands.Cog.listener()
@@ -46,7 +46,7 @@ class Memevoting(commands.Cog):
         # await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
         # ( testing disabling this, shouldn't be needed if logic is logical )
         while not self.bot.is_closed():
-            self.current_scan = dt.datetime.now()
+            self.current_scan = dt.datetime.utcnow()
             if dt.timedelta(2) < self.current_scan - self.prev_scan < dt.timedelta(7):
                 await self.remove_meme_roles()  # make this function find guild
 
@@ -91,7 +91,7 @@ class Memevoting(commands.Cog):
                 embed.set_image(url=attachment.url)
             main_content = f"[{attachment.filename}]({attachment.url})"
 
-        embed.add_field(name=main_content, value=f"**{congrats_message}{participant_msg.author.display_name}!**")
+        embed.add_field(name=f"**{congrats_message}{participant_msg.author.display_name}!**", value=main_content)
         return embed
 
     async def get_meme_contest_results(self):
@@ -123,7 +123,8 @@ class Memevoting(commands.Cog):
 
             for winners_message in winners_messages:
                 embed = await self.get_result_embed(winners_message, winner_or_loser="winner", emoji="\U0001f44d")
-                await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
+                if not isinstance(memeresultchannel, None):  # clean this up
+                    await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
                 member = winners_message.author
                 if member in loser_members:  # member can't be winner AND loser!
                     try:
@@ -152,7 +153,7 @@ class Memevoting(commands.Cog):
             for member in memechannel.members:
                 for role in valid_roles:
                     try:
-                        await member.remove_role(role, reason="Meme contest")
+                        await member.remove_roles([role], reason="Meme contest")
                     except discord.Forbidden:
                         pass
                     except discord.HTTPException:
