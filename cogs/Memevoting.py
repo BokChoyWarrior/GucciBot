@@ -77,8 +77,7 @@ class Memevoting(commands.Cog):
             congrats_message = "Sent by boring loser: "
 
         embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
-                              timestamp=dt.datetime.now(tz=dt.timezone.utc),
-                              description=f"**[Link to message]({participant_msg.jump_url})**")
+                              timestamp=dt.datetime.now(tz=dt.timezone.utc))
         embed.set_thumbnail(url=participant_msg.author.avatar_url)
         embed.set_footer(text="GucciBot", icon_url=self.bot.user.avatar_url)
 
@@ -91,7 +90,9 @@ class Memevoting(commands.Cog):
                 embed.set_image(url=attachment.url)
             main_content = f"[{attachment.filename}]({attachment.url})"
 
-        embed.add_field(name=f"**{congrats_message}{participant_msg.author.display_name}!**", value=main_content)
+        embed.add_field(name=f"**{congrats_message}{participant_msg.author.display_name}!**", value=f"**[Link to message]({participant_msg.jump_url})**")
+
+        embed.description = main_content
         return embed
 
     async def get_meme_contest_results(self):
