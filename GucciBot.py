@@ -4,7 +4,13 @@ from discord.ext import commands
 import discord
 import logging
 import config
+import shutil
+
 # from cogs.utils import db
+
+# check for ffmpeg
+if shutil.which("ffmpeg") is None:
+    print("FFMPEG not found - please ensure it is installed within the venv AND the system+path")
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
