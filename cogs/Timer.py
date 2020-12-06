@@ -20,7 +20,7 @@ class Timer(commands.Cog):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
             current_time = datetime.datetime.utcnow()
-            if (current_time.hour == 16 or current_time.hour == 4) and current_time.minute > 20:
+            if (current_time.hour == 16 or current_time.hour == 4) and current_time.minute == 20:
                 for guild in self.bot.guilds:
                     for voice_channel in guild.voice_channels:
                         if len(voice_channel.members) > 0:
@@ -28,8 +28,8 @@ class Timer(commands.Cog):
                                 myobj = gTTS(text="Oh look, it's that time again! 4:20 Blaze it!")
                                 myobj.save("420.mp3")
                             await utils.play_files(["420.mp3", "sounds/air horn.mp3"], channel=voice_channel)
-                await asyncio.sleep(30)
-            await asyncio.sleep(3600)
+                await asyncio.sleep(3600)
+            await asyncio.sleep(5)
 
     @commands.command()
     async def say(self, ctx, text, lang="en"):
