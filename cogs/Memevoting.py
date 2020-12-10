@@ -108,6 +108,8 @@ class Memevoting(commands.Cog):
             winners_messages, upvotes = await self.get_reaction_results(messages, "\U0001f44d")
             losers_messages, downvotes = await self.get_reaction_results(messages, "\U0001f44e")
 
+
+            # TODO: tidy this up!
             loser_members = []
             for losers_message in losers_messages:
                 embed = await self.get_result_embed(losers_message, winner_or_loser="loser", emoji="\U0001f44e")
@@ -152,13 +154,12 @@ class Memevoting(commands.Cog):
                 continue
 
             for member in memechannel.members:
-                for role in valid_roles:
-                    try:
-                        await member.remove_roles([role], reason="Meme contest")
-                    except discord.Forbidden:
-                        pass
-                    except discord.HTTPException:
-                        pass
+                try:
+                    await member.remove_roles(*[valid_roles], reason="Meme contest")
+                except discord.Forbidden:
+                    pass
+                except discord.HTTPException:
+                    pass
 
     @staticmethod
     async def react_to_message(message):
