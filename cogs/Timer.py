@@ -25,7 +25,7 @@ class Timer(commands.Cog):
                     for voice_channel in guild.voice_channels:
                         if len(voice_channel.members) > 0:
                             if not os.path.isfile("420.mp3"):
-                                myobj = gTTS(text="Oh look, it's that time again! 4:20 Blaze it!")
+                                myobj = gTTS(text="Oh look, it's that time again! 4:20 Blaze it!", lang="en")
                                 myobj.save("420.mp3")
                             await utils.play_files(["420.mp3", "sounds/air horn.mp3"], channel=voice_channel)
                 await asyncio.sleep(3600)
