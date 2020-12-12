@@ -19,6 +19,8 @@ class Fun(commands.Cog):
         if message.author.bot:
             return
         prefix = await self.bot.get_prefix(message)
+        if not message.guild:
+            return
         if message.guild.get_role(668798124751323146) in message.author.roles:
             if message.content.startswith("http") or message.content == "":
                 return
