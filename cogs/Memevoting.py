@@ -155,7 +155,7 @@ class Memevoting(commands.Cog):
 
             for member in memechannel.members:
                 try:
-                    await member.remove_roles(*[valid_roles], reason="Meme contest")
+                    await member.remove_roles(*valid_roles, reason="Meme contest")
                 except discord.Forbidden:
                     pass
                 except discord.HTTPException:
