@@ -6,11 +6,19 @@ import logging
 import config
 import shutil
 
+
 # from cogs.utils import db
 
 # check for ffmpeg
-if shutil.which("ffmpeg") is None:
-    print("FFMPEG not found - please ensure it is installed within the venv AND the system+path")
+def check_ffmpeg():
+    ffmpeg_ver = shutil.which("ffmpeg")
+    if ffmpeg_ver is None:
+        print("FFMPEG not found - please ensure it is installed within the venv AND the system+path")
+    else:
+        print("FFMPEG found: " + str(ffmpeg_ver))
+
+
+check_ffmpeg()
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)

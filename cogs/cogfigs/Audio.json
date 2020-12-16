@@ -10,18 +10,6 @@
     ],
       "sounds": ["btc"]
     },
-    {"name": "dota",
-      "phrases":
-      [
-        "<@&382945841666719754>",
-        "dota2",
-        "dota"
-      ],
-      "sounds":
-      [
-        "At Valve.mp3"
-      ]
-    },
     {"name": "congratulate",
       "phrases":
       [
@@ -34,18 +22,6 @@
         "clap.mp3"
       ]
     },
-    {"name" : "mlg",
-    "phrases":
-    [
-      "mlg",
-      "pro"
-    ],
-    "sounds":
-    [
-      "air horn.mp3",
-      "clap.mp3"
-    ]
-    },
     {"name":"spongebob",
     "phrases":
     [
@@ -55,157 +31,11 @@
     ],
       "sounds": ["spongebob.mp3"]
     },
-    {"name": "salt",
-    "phrases": [
-      "salt",
-      "salty",
-      "rq",
-      "ragequit",
-      "rage"
-    ],
-    "sounds": [
-      "let me ask u smth ya deep shit.mp3",
-      "Filthy casual can't even tech properly.mp3",
-      "Ever since ultimate came out my for glory score hasn't improved.mp3"
-    ]
-    },
-    {"name": "gaymers",
-    "phrases": [
-      "gaming",
-      "gamers",
-      "gamer",
-      "gaymers",
-      "gaymer"
-    ],
-    "sounds": [
-      "They targeted gamers.mp3",
-      "“These are people who are uneducated — they.mp3",
-      "PewDiePie isn't racist, he just harbours and.mp3",
-      "Gatekeeping is necessary for Gaming.mp3",
-      "Do you seriously spend over 40 hours (not minutes) a week playing video games.mp3",
-      "Pewdiepie well done, you alienated your viewers.mp3",
-      "The Red Pill is 120.mp3",
-      " thousand fit college educated middle class men.mp3"]
-    },
-    {
-      "name": "stuart little",
-      "phrases": [
-        "stuart",
-        "rat",
-        "mouse"
-      ],
-      "sounds": [
-        "I fucking hate Stuart Little.mp3",
-        "You got two bullets.mp3"
-      ]
-
-    },
-    {
-      "name": "hentai",
-      "phrases": [
-        "hentai",
-        "crate",
-        "dvd",
-        "waifu",
-        "christmas"
-      ],
-      "sounds": [
-        "On the first day of Christmas my father gave to me.mp3"
-      ]
-    },
-    {
-      "name": "duolingo",
-      "phrases": ["duolingo", "bird"],
-      "sounds":["Duolingo.mp3", "Duolingo Italian.mp3"]
-    },
     {
       "name": "hamburger",
       "phrases": ["burger"],
       "sounds":["Hamburger.mp3"]
     },
-    {
-      "name": "spanish",
-      "phrases": ["spanish", "spain", "espanol", "mexico", "mexican"],
-      "sounds": ["Duolingo.mp3"]
-    },
-    {
-      "name": "italian",
-      "phrases": ["italian", "italy", "dolmio", "kyle"],
-      "sounds":["Duolingo Italian.mp3"]
-    },
-    {
-      "name": "nsfw",
-      "phrases": ["nsfw", "<#442827206096322562>"],
-      "sounds":["Gru can swing his penis fast enough to break.mp3", "If every male on earth got a boner at the same time.mp3", "My anus has weird powers !.mp3", "Peeing with a boner is more difficult than giving birth.mp3", "So I cummed on my boss's ass today.mp3", "I accidentally made my cat gay and he thinks I’m his lover.mp3", "I have a math fetish.mp3", "On the first day of Christmas my father gave to me.mp3", "Realistically, how large is Thanos's penis.mp3", "Why Ant-Man shouldn’t go up Thanos’ asshole.mp3", "Lucid sex has turned me into a incest love bisexual.mp3", "My favourite episode was when Freddie was.mp3", "Do Not stick your dick inside a shampoo bottle.mp3", "Frankly I think us men should no longer hide our erections in public.mp3", "I shove pennies up my ass and give them to the homeless.mp3", "I want to bang the minecraft creeper.mp3", "I was born with a genetic disorder that causes my foreskin to grow endlessly.mp3", "I don’t know when this trend started, but it was weird then and it’s weird now.mp3", "I am going to have sex with this female Flame Atronach from Oblivion.mp3", "Different Flavors of Jizz.mp3", "Do not stick pencil lead down your pee pee hole.mp3", "I broke the family computer by downloading a lot of porn off of Limewire.mp3", "I used my sister's toothbrush to unclog a poop(mine) blocked toilet.mp3", "PORN IS BIG GAY.mp3", "Steve and his girlfriend Samantha went off to college in August.mp3"]
-    },
-    {
-      "name": "furry",
-      "phrases": ["furry", "owo", "uwu"],
-      "sounds":["Notices bulge, OwO what's this.mp3", "I can't explain how fucking much I NEED a furry body.mp3", "The average fox needs 2,000 calories a day.mp3"]
-
-    },
-    {
-      "name": "bum",
-      "phrases": ["ass", "anus", "arse", "bum"],
-      "sounds":["My anus has weird powers !.mp3", "I shove pennies up my ass and give them to the homeless.mp3", "I accidentally made my cat gay and he thinks I’m his lover.mp3", "Why Ant-Man shouldn’t go up Thanos’ asshole.mp3", "So I cummed on my boss's ass today.mp3"]
-
-    },
-    {
-      "name": "penis",
-      "phrases": ["penis", "dick", "boner", "peepee", "erection"],
-      "sounds":["Gru can swing his penis fast enough to break.mp3", "If every male on earth got a boner at the same time.mp3", "Realistically, how large is Thanos's penis.mp3", "Frankly I think us men should no longer hide our erections in public.mp3", "Do Not stick your dick inside a shampoo bottle.mp3", "Do not stick pencil lead down your pee pee hole.mp3", "I was born with a genetic disorder that causes my foreskin to grow endlessly.mp3"]
-
-    },
-        {
-      "name": "cum",
-      "phrases": ["cum", "jizz", "ejaculation", "ejaculate"],
-      "sounds":["Gru can swing his penis fast enough to break.mp3", "So I cummed on my boss's ass today.mp3", "Different Flavors of Jizz.mp3"]
-    },
-        {
-      "name": "porn",
-      "phrases": ["porn"],
-      "sounds":["I dont know when this trend started, but it was weird then and its weird now.mp3", "I broke the family computer by downloading a lot of porn off of Limewire.mp3", "PORN IS BIG GAY.mp3"]
-    },
-        {
-      "name": "twitch",
-      "phrases": ["twitch"],
-      "sounds":["At Valve.mp3", "My son (14) watches a lot of video game streamers on Twitch.tv.mp3", "At the end of the day he's only one person and it doesn't matter in the long run.mp3", "Hi! My name is Ninja, I claimed to be the best in the world.mp3"]
-    },
-        {
-      "name": "valve",
-      "phrases": ["valve"],
-      "sounds":["At Valve.mp3"]
-    },
-        {
-      "name": "song",
-      "phrases": ["tune", "song", "banger", "dj", "<#372196320271794188>", "<#388815228672147456>"],
-      "sounds":["Hit or miss, I guess they never miss, huh.mp3", "I just fucked your bitch in some Gucci flip flops.mp3", "Seems like everybody's got a price.mp3", "Somewhere over the rainbow.mp3", "Trapping ain't dead.mp3", "Gwop expenses gwop expenses.mp3", "Where has everybody gone.mp3", "Shawty had them apple bottom jeans.mp3"]
-    },
-        {
-      "name": "hit or miss",
-      "phrases": ["hit or miss"],
-      "sounds":["Hit or miss, I guess they never miss, huh.mp3", "Strike or folly, I suppose they seldom folly, do you concur.mp3", "To hit, or not to hit.mp3"]
-    },
-        {
-      "name": "pokemon",
-      "phrases": ["pokemon", "pokémon", "<#441684249188237332>"],
-      "sounds":["I asked a guy if he knew about Pokemon today.mp3", "I love my wife, Reshiram with all my heart.mp3", "I love Pokemon Sword and Shield, but I think these games may be a bit too difficult.mp3"]
-    },
-        {
-      "name": "charizard",
-      "phrases": ["charizard", "undefeated", "reset", "sword", "shield", "swsh"],
-      "sounds":["I love Pokemon Sword and Shield, but I think these games may be a bit too difficult.mp3"]
-    },
-        {
-      "name": "harry potter",
-      "phrases": ["harry", "potter", "1911"],
-      "sounds":["Harry Potter should have carried an M1911.mp3"]
-    },        {
-      "name": "teenager",
-      "phrases": ["teenager", "gucci"],
-      "sounds":["wanna know what teenagers actually do at night.mp3"]
-    }
-
 ],
   "reply_commands": [
     {

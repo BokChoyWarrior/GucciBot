@@ -1,6 +1,6 @@
 from captionbot import CaptionBot
 from discord.ext import commands
-
+from .utils.utils import measuretime as measuretime
 
 class MyCaptionBot(commands.Cog):
 
@@ -10,9 +10,10 @@ class MyCaptionBot(commands.Cog):
 
     @commands.command()
     async def caption(self, ctx, url_query):
-        if ctx.channel.id == 669139299350085662:
+        print("Captioning: "+url_query)
+        with measuretime("Getting caption from MS"):
             caption = self.c.url_caption(str(url_query))
-            await ctx.send(caption)
+        await ctx.send(caption)
 
 
 def setup(bot):

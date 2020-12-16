@@ -1,9 +1,9 @@
 import random
 
-from discord import Role
-
 from .utils import utils
 from discord.ext import commands
+
+from gtts import gTTS
 
 prefix = "!"
 
@@ -22,6 +22,7 @@ class Audio(commands.Cog, name="Audio"):
         pass
 
     """ AOE2 sounds """
+
     @commands.group()
     async def aoe2(self, ctx):
         pass
@@ -47,6 +48,7 @@ class Audio(commands.Cog, name="Audio"):
         await utils.play_files("sounds/aoe2/30.ogg", ctx)
 
     """ PLAY commands"""
+
     @commands.group()
     async def play(self, ctx):
         pass
@@ -92,6 +94,19 @@ class Audio(commands.Cog, name="Audio"):
         btc = random.randint(0, 41)
         sound_path = f"sounds/bitconnect/Bitconnect{btc}.mp3"
         await utils.play_files(sound_path, ctx)
+
+    """ SAY COMMAND """
+    @commands.command()
+    async def say(self, ctx, text, lang="en"):
+        if ctx.message.author.voice is not None:
+            with utils.measuretime("Getting gtts object"):
+                gttsobj = gTTS(text=text, lang=lang, slow=False)
+            with utils.measuretime("Saving gtts mp3"):
+                gttsobj.save("sounds/say.mp3")
+            await utils.play_files("sounds/say.mp3", message=ctx)
+        else:
+            print("User not in voice channel")
+            await ctx.send(content="Please join a voice channel to use this command.", delete_after=10)
 
 
 def setup(bot):

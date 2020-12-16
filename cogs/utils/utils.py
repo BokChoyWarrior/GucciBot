@@ -2,6 +2,15 @@ import asyncio
 import discord
 import random
 import json
+from contextlib import contextmanager
+from time import perf_counter
+
+
+@contextmanager
+def measuretime(description: str) -> None:
+    t1 = perf_counter()
+    yield
+    print(f"'{description}' took: {(perf_counter() - t1):.04f} s")
 
 
 def channel_is_serious(givenchannelid, data=None):

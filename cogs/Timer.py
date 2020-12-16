@@ -2,7 +2,6 @@ import asyncio
 import datetime
 import os.path
 
-from time import perf_counter
 from gtts import gTTS
 from discord.ext import commands
 
@@ -30,23 +29,6 @@ class Timer(commands.Cog):
                             await utils.play_files(["420.mp3", "sounds/air horn.mp3"], channel=voice_channel)
                 await asyncio.sleep(3600)
             await asyncio.sleep(5)
-
-    @commands.command()
-    async def say(self, ctx, text, lang="en"):
-        if ctx.message.author.voice is not None:
-            t1 = perf_counter()
-            gttsobj = gTTS(text=text, lang=lang, slow=False)
-            t2 = perf_counter()
-            print("hi")
-            print("GETTING the GTTS object took " + str(t2-t1) + " seconds.")
-            t1 = perf_counter()
-            gttsobj.save("sounds/say.mp3")
-            t2 = perf_counter()
-            print("SAVING the GTTS object took " + str(t2-t1) + " seconds.")
-            await utils.play_files("sounds/say.mp3", message=ctx)
-        else:
-            print("User not in voice channel")
-            await ctx.send(content="Please join a voice channel to use this command.", delete_after=10)
 
 
 def setup(bot):
