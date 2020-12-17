@@ -47,7 +47,11 @@ class Audio(commands.Cog, name="Audio"):
     async def _30(self, ctx):
         await utils.play_files("sounds/aoe2/30.ogg", ctx)
 
-    """ PLAY commands"""
+    """ 
+    PLAY commands 
+    Very fun!
+    
+    """
 
     @commands.group()
     async def play(self, ctx):
@@ -73,27 +77,39 @@ class Audio(commands.Cog, name="Audio"):
     async def _blood_clot(self, ctx):
         await utils.play_files("sounds/Blood clot.mp3", ctx)
 
-    @play.group(name="cummy")
-    async def _cummy(self, ctx):
-        await utils.play_files("sounds/Can you guy stop making Cummy say weird shit.mp3", ctx)
-
-    @play.group(name="brainless")
-    async def _brainless(self, ctx):
-        await utils.play_files("sounds/It's incredible how brainless you are.mp3", ctx)
-
-    @play.group(name="1201")
-    async def _1201(self, ctx):
-        await utils.play_files("sounds/1201.mp3", ctx)
-
-    @play.group(name="1811")
-    async def _1811(self, ctx):
-        await utils.play_files("sounds/stop inviting me to dota.mp3", ctx)
-
     @play.group(name="btc")
     async def _btc(self, ctx):
         btc = random.randint(0, 41)
         sound_path = f"sounds/bitconnect/Bitconnect{btc}.mp3"
         await utils.play_files(sound_path, ctx)
+
+    @play.group(name="hamburger")
+    async def _hamburger(self, ctx):
+        await utils.play_files("sounds/Hamburger.mp3", ctx)
+
+    @play.group(name="dipesh")
+    async def _dipesh(self, ctx):
+        await utils.play_files("sounds/xplozionz.mp3", ctx)
+
+    @play.group(name="excluded")
+    async def _excluded(self, ctx):
+        await utils.play_files("sounds/excluded.mp3", ctx)
+
+    @play.group(name="cappuccino")
+    async def _cappuccino(self, ctx):
+        await utils.play_files("sounds/cappuccino.mp3", ctx)
+
+    @play.group(name="kav")
+    async def _kav(self, ctx):
+        await utils.play_files("sounds/Kav=.mp3", ctx)
+
+    @play.group(name="spongebob")
+    async def _spongebob(self, ctx):
+        await utils.play_files("sounds/spongebob.mp3", ctx)
+
+    @play.group(name="xavier")
+    async def _xavier(self, ctx):
+        await utils.play_files("sounds/xra sb.mp3", ctx)
 
     """ SAY COMMAND """
     @commands.command()
