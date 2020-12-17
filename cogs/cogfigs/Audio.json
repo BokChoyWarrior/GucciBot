@@ -35,7 +35,7 @@
       "name": "hamburger",
       "phrases": ["burger"],
       "sounds":["Hamburger.mp3"]
-    },
+    }
 ],
   "reply_commands": [
     {
