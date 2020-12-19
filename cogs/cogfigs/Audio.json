@@ -1,48 +1,10 @@
 {
-  "sound_commands": [
-    {"name":  "btc",
-    "phrases":[
-      "btc",
-      "bitcoin",
-      "xmr",
-      "crypto",
-      "bitconnect"
-    ],
-      "sounds": ["btc"]
-    },
-    {"name": "congratulate",
-      "phrases":
-      [
-        "well done",
-        "good job",
-        "wow!"
-      ],
-      "sounds":
-      [
-        "clap.mp3"
-      ]
-    },
-    {"name":"spongebob",
-    "phrases":
-    [
-      "spongebob",
-      "patrick",
-      "squidward"
-    ],
-      "sounds": ["spongebob.mp3"]
-    },
-    {
-      "name": "hamburger",
-      "phrases": ["burger"],
-      "sounds":["Hamburger.mp3"]
-    }
-]
   "reply_commands": [
     {
       "name": "sexism",
       "phrases": [
         "sexy", "sex", "leila", "girls", "girl", "woman", "bitch", "gyal", "women", "yatties", "bird",
-        "vaginas", "vagina", "grills", "grill"],
+        "vaginas", "vagina", "grills", "grill", "pussy", "cunt"],
       "reply_string": "That's sexist! You cant say {}!"
     }
   ]
