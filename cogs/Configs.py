@@ -22,8 +22,12 @@ class Configs(commands.Cog):
         self.bot = bot
         self.name = "Configs"
 
-    @commands.command()
+    @commands.command(usage="""channel_id
+    Where channel_id is an id of a voice channel in your server.""")
+    @commands.guild_only()
+    @commands.has_guild_permissions(manage_permissions=True)
     async def serious(self, ctx, text):
+        """Changes a channel's serious setting. If a channel is serious, the bot will not join that particular voice channel."""
         channel_id = await handle_input(ctx, text)
         if not channel_id:
             return
@@ -34,8 +38,11 @@ class Configs(commands.Cog):
             srs_string = ""
         await ctx.send("**<#" + str(channel_id) + ">** with ID " + str(channel_id) + f" had it's serious level changed and is now **{srs_string}serious**.")
 
-    @commands.command()
+    @commands.command(usage="""channel_id
+    Where channel_id is an id of a voice channel in your server.""")
+    @commands.guild_only()
     async def isserious(self, ctx, text):
+        """Checks a voice channel's serious level. (Whether or not the bot can use voice in the channel)"""
         channel_id = await handle_input(ctx, text)
         if not channel_id:
             return

@@ -13,6 +13,12 @@ class Audio(commands.Cog, name="Audio"):
         self.bot = bot
         self.name = "Audio"
 
+    @commands.command()
+    async def stop(self, ctx):
+        """Stops any voice activity and disconnects the bot from the voice channel."""
+        ctx.voice_client.stop()
+        await ctx.voice_client.disconnect()
+
     @commands.Cog.listener()
     async def on_ready(self):
         pass
@@ -25,6 +31,7 @@ class Audio(commands.Cog, name="Audio"):
 
     @commands.group()
     async def aoe2(self, ctx):
+        """Play a sound from AoE:II."""
         pass
 
     @aoe2.group(name="11")
@@ -55,13 +62,14 @@ class Audio(commands.Cog, name="Audio"):
 
     @commands.group()
     async def play(self, ctx):
+        """Plays the given sound."""
         pass
 
-    @play.group(name="airhorn")
+    @play.group(name="airhorn", aliases=["horn"])
     async def _Airhorn(self, ctx):
         await utils.play_files("sounds/air horn.mp3", ctx)
 
-    @play.group(name="weed")
+    @play.group(name="weed", aliases=["420"])
     async def _Weed(self, ctx):
         await utils.play_files("sounds/Weed.mp3", ctx)
 
@@ -77,17 +85,17 @@ class Audio(commands.Cog, name="Audio"):
     async def _blood_clot(self, ctx):
         await utils.play_files("sounds/Blood clot.mp3", ctx)
 
-    @play.group(name="btc")
+    @play.group(name="btc", aliases=["bitcoin"])
     async def _btc(self, ctx):
         btc = random.randint(0, 41)
         sound_path = f"sounds/bitconnect/Bitconnect{btc}.mp3"
         await utils.play_files(sound_path, ctx)
 
-    @play.group(name="hamburger")
+    @play.group(name="hamburger", aliases=["burger"])
     async def _hamburger(self, ctx):
         await utils.play_files("sounds/Hamburger.mp3", ctx)
 
-    @play.group(name="dipesh")
+    @play.group(name="dipesh", aliases=["dippstar"])
     async def _dipesh(self, ctx):
         await utils.play_files("sounds/xplozionz.mp3", ctx)
 
@@ -107,7 +115,7 @@ class Audio(commands.Cog, name="Audio"):
     async def _spongebob(self, ctx):
         await utils.play_files("sounds/spongebob.mp3", ctx)
 
-    @play.group(name="xavier")
+    @play.group(name="xavier", aliases=["xra"])
     async def _xavier(self, ctx):
         await utils.play_files("sounds/xra sb.mp3", ctx)
 
@@ -116,8 +124,17 @@ class Audio(commands.Cog, name="Audio"):
         await utils.play_files("sounds/Koksockar.mp3", ctx)
 
     """ SAY COMMAND """
-    @commands.command()
+    @commands.command(help="Speaks your message with Google text-to-speech.",
+                      usage="""\"text\" language-tag
+    
+    Where your *text* is enclosed in quotes and *language-tag* is an IETF lnguage tag such as 
+        -"en-GB"
+        -"fr"(french)
+        -"es"(spanish) etc.
+        
+    Leave no language tag for default (en)""")
     async def say(self, ctx, text, lang="en"):
+        """Speaks your message with Google text-to-speech."""
         if ctx.message.author.voice is not None:
             with utils.measuretime("Getting gtts object"):
                 gttsobj = gTTS(text=text, lang=lang, slow=False)
