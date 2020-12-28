@@ -106,36 +106,36 @@ class Memevoting(commands.Cog):
             if not messages:
                 return
             winners_messages, upvotes = await self.get_reaction_results(messages, "\U0001f44d")
-            losers_messages, downvotes = await self.get_reaction_results(messages, "\U0001f44e")
+            # losers_messages, downvotes = await self.get_reaction_results(messages, "\U0001f44e")
 
 
             # TODO: tidy this up!
-            loser_members = []
-            for losers_message in losers_messages:
-                embed = await self.get_result_embed(losers_message, winner_or_loser="loser", emoji="\U0001f44e")
-                # await memechannel.send(content=f"**\U0001f44e {downvotes}**", embed=embed)
-                member = losers_message.author
-                if member not in loser_members:
-                    loser_members.append(member)
-                    try:
-                        await member.add_roles(meme_loser_role, reason="meme contest")
-                    except discord.Forbidden as e:
-                        print(e + " - You do not have permission to add these roles.")
-                    except discord.HTTPException as e:
-                        print(e)
+            # loser_members = []
+            # for losers_message in losers_messages:
+            #     embed = await self.get_result_embed(losers_message, winner_or_loser="loser", emoji="\U0001f44e")
+            #     # await memechannel.send(content=f"**\U0001f44e {downvotes}**", embed=embed)
+            #     member = losers_message.author
+            #     if member not in loser_members:
+            #         loser_members.append(member)
+            #         try:
+            #             await member.add_roles(meme_loser_role, reason="meme contest")
+            #         except discord.Forbidden as e:
+            #             print(e + " - You do not have permission to add these roles.")
+            #         except discord.HTTPException as e:
+            #             print(e)
 
             for winners_message in winners_messages:
                 embed = await self.get_result_embed(winners_message, winner_or_loser="winner", emoji="\U0001f44d")
                 if not memeresultchannel is None:  # clean this up
                     await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
                 member = winners_message.author
-                if member in loser_members:  # member can't be winner AND loser!
-                    try:
-                        await member.add_roles(meme_winner_role, reason="meme contest")
-                    except discord.Forbidden as e:
-                        print(e + " - You do not have permission to add these roles.")
-                    except discord.HTTPException as e:
-                        print(e)
+                # if member in loser_members:  # member can't be winner AND loser!
+                try:
+                    await member.add_roles(meme_winner_role, reason="meme contest")
+                except discord.Forbidden as e:
+                    print(e + " - You do not have permission to add these roles.")
+                except discord.HTTPException as e:
+                    print(e)
 
     async def remove_meme_roles(self):
         for guild_id in self.guild_ids:
@@ -165,9 +165,6 @@ class Memevoting(commands.Cog):
     async def react_to_message(message):
         try:
             await message.add_reaction("\U0001f44d")
-            await asyncio.sleep(0.3)
-            await message.add_reaction("\U0001f44e")
-            await asyncio.sleep(0.3)
         except discord.errors.NotFound:
             print("Message was deleted before we could react!")
 
