@@ -111,6 +111,10 @@ class Audio(commands.Cog, name="Audio"):
     async def _xavier(self, ctx):
         await utils.play_files("sounds/xra sb.mp3", ctx)
 
+    @play.group(name="gnaron")
+    async def _gnaron(self, ctx):
+        await utils.play_files("sounds/Koksockar.mp3", ctx)
+
     """ SAY COMMAND """
     @commands.command()
     async def say(self, ctx, text, lang="en"):
