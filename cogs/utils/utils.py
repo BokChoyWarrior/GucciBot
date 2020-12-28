@@ -38,9 +38,12 @@ def change_seriousness(givenchannelid):
     with open("cogs/cogfigs/SeriousChannels.json", "w+") as f:
         if channel_is_serious(givenchannelid, data):
             data["channelIds"].remove(givenchannelid)
+            serious = False
         else:
             data["channelIds"].append(givenchannelid)
+            serious = True
         json.dump(data, f, indent=2)
+        return serious
 
 
 def channel_exists(givenchannelid, guild):

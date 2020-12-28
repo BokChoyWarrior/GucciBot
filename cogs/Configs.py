@@ -2,35 +2,41 @@ import asyncio
 from discord.ext import commands
 from cogs.utils import utils
 
+
+async def handle_input(ctx, text):
+    try:
+        channel_id = int(text)
+    except ValueError:
+        await ctx.send("Please enter a valid channel ID")
+        return
+
+    if not utils.channel_exists(channel_id, ctx.guild):
+        await ctx.send("Channel with ID \"" + str(channel_id) + "\" doesn't exist in this guild.")
+        return
+    return channel_id
+
+
 class Configs(commands.Cog):
 
     def __init__(self, bot):
         self.bot = bot
         self.name = "Configs"
 
-    async def handle_input(self, ctx, text):
-        try:
-            channel_id = int(text)
-        except ValueError:
-            await ctx.send("Please enter a valid channel ID")
-            return
-
-        if not utils.channel_exists(channel_id, ctx.guild):
-            await ctx.send("Channel with ID \"" + str(channel_id) + "\" doesn't exist in this guild.")
-            return
-        return channel_id
-
     @commands.command()
     async def serious(self, ctx, text):
-        channel_id = await self.handle_input(ctx, text)
+        channel_id = await handle_input(ctx, text)
         if not channel_id:
             return
-        utils.change_seriousness(channel_id)
-        await ctx.send("**<#" + str(channel_id) + ">** with ID " + str(channel_id) + " had it's serious level changed.")
+        serious = utils.change_seriousness(channel_id)
+        if not serious:
+            srs_string = "not "
+        else:
+            srs_string = ""
+        await ctx.send("**<#" + str(channel_id) + ">** with ID " + str(channel_id) + f" had it's serious level changed and is now **{srs_string}serious**.")
 
     @commands.command()
     async def isserious(self, ctx, text):
-        channel_id = await self.handle_input(ctx, text)
+        channel_id = await handle_input(ctx, text)
         if not channel_id:
             return
         reply = ""
