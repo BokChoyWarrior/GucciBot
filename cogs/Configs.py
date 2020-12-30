@@ -54,5 +54,11 @@ class Configs(commands.Cog):
 
         await ctx.send("**<#" + str(channel_id) + ">** (ID " + str(channel_id) + ") " + reply)
 
+    @commands.command()
+    @commands.guild_only()
+    async def list_serious(self, ctx):
+        pass
+
+
 def setup(bot):
     bot.add_cog(Configs(bot))
