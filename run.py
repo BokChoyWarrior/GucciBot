@@ -42,7 +42,7 @@ initial_extensions = [
     "MyCaptionBot",
     "Timer",
     # "ImageTools",
-    "Configs",
+    # TEMP "Configs",
     # "Basics2"
 ]
 
