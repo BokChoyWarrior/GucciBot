@@ -3,15 +3,15 @@ from .utils import utils
 from discord.ext import commands
 
 
-async def cache_replies():
+def cache_replies():
+    data = {}
     try:
         fp = "cogs/cogfigs/Audio.json"
         with open(fp) as f:
             data = json.load(f)["reply_commands"]
-            return data
     except FileNotFoundError as e:
         print(e, "file path is:", fp, sep=" ")
-
+    return data
     # for sound_command in data["sound_commands"]:
     #     word = utils.message_contains(sound_command["phrases"], message)
     #     if word:
