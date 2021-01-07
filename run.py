@@ -41,8 +41,9 @@ initial_extensions = [
     "Memevoting",
     "MyCaptionBot",
     "Timer",
+    "Configs",
     # "ImageTools",
-    # TEMP "Configs",
+
     # "Basics2"
 ]
 

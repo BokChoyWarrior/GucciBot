@@ -7,53 +7,63 @@ from time import perf_counter
 
 
 @contextmanager
-def measuretime(description: str) -> None:
+def measure_time(description: str) -> None:
     t1 = perf_counter()
     yield
     print(f"'{description}' took: {(perf_counter() - t1):.04f} s")
 
 
-def channel_is_serious(givenchannelid, data=None):
-    if not data:
-        try:
-            fp = "cogs/cogfigs/SeriousChannels.json"
-            with open(fp) as f:
-                data = json.load(f)
-        except FileNotFoundError as e:
-            print(e, "file path is:", fp, sep=" ")
-    for channelId in data["channelIds"]:
-        if givenchannelid == channelId:
-            return True
-    return False
-
-
-def change_seriousness(givenchannelid):
-    data = {}
+def get_serious_channel_data():
     try:
         fp = "cogs/cogfigs/SeriousChannels.json"
         with open(fp) as f:
             data = json.load(f)
     except FileNotFoundError as e:
         print(e, "file path is:", fp, sep=" ")
+    return data
+
+
+def channel_is_serious(guild_id, channel_id, data=None):
+    if not data:
+        data = get_serious_channel_data()
+        print(type(channel_id))
+        print(data[guild_id])
+    if channel_id in data[guild_id]:
+        print("Found channel")
+        return True
+    else:
+        print("Didnt find channel")
+        return False
+
+
+def change_seriousness(ctx, channel_id):
+    channel_id = str(channel_id)
+    guild_id = str(ctx.guild.id)
+    data = get_serious_channel_data()
+
     with open("cogs/cogfigs/SeriousChannels.json", "w+") as f:
-        if channel_is_serious(givenchannelid, data):
-            data["channelIds"].remove(givenchannelid)
+        if channel_is_serious(guild_id, channel_id, data):
+            data[guild_id].remove(channel_id)
             serious = False
         else:
-            data["channelIds"].append(givenchannelid)
+            data[guild_id].append(channel_id)
             serious = True
         json.dump(data, f, indent=2)
         return serious
 
 
-def channel_exists(givenchannelid, guild):
+def check_channel_existence_and_type(channel_id, guild):
+    channel_id = int(channel_id)
     for voice_channel in guild.voice_channels:
-        if givenchannelid == voice_channel.id:
-            return True
+        if channel_id == voice_channel.id:
+            return discord.VoiceChannel
+    for text_channel in guild.text_channels:
+        if channel_id == text_channel.id:
+            return discord.TextChannel
     return False
 
 
-async def play_files(files, message=None, channel=None):
+async def play_files(files, ctx, message=None, channel=None):
     if isinstance(files, str):
         files_to_play = [files]
     else:

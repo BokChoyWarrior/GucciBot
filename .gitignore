@@ -7,6 +7,7 @@ backslash.mp3
 *.png
 *.jpg
 *.jpeg
+SeriousChannels_backup.json
 
 # Byte-compiled / optimized / DLL files
 __pycache__/

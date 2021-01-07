@@ -136,9 +136,9 @@ class Audio(commands.Cog, name="Audio"):
     async def say(self, ctx, text, lang="en"):
         """Speaks your message with Google text-to-speech."""
         if ctx.message.author.voice is not None:
-            with utils.measuretime("Getting gtts object"):
+            with utils.measure_time("Getting gtts object"):
                 gttsobj = gTTS(text=text, lang=lang, slow=False)
-            with utils.measuretime("Saving gtts mp3"):
+            with utils.measure_time("Saving gtts mp3"):
                 gttsobj.save("sounds/say.mp3")
             await utils.play_files("sounds/say.mp3", message=ctx)
         else:
