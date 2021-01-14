@@ -43,8 +43,6 @@ class Memevoting(commands.Cog):
 
     async def meme_contest_bg_task(self):
         await self.bot.wait_until_ready()
-        # await asyncio.sleep(5)  # so that the prev_scan value can be fetched before running the following code
-        # ( testing disabling this, shouldn't be needed if logic is logical )
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.utcnow()
             if dt.timedelta(2) < self.current_scan - self.prev_scan < dt.timedelta(7):
@@ -58,7 +56,7 @@ class Memevoting(commands.Cog):
                     self.data["last_scan"] = self.prev_scan.isoformat()
                     json.dump(self.data, f, indent=2)
 
-            await asyncio.sleep(1800)
+            await asyncio.sleep(60)
 
     @commands.Cog.listener()
     async def on_message(self, message):
