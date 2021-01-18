@@ -1,6 +1,7 @@
 import asyncio
 import datetime as dt
 import json
+from cogs.utils import db
 import discord
 from discord.ext import commands
 
@@ -8,7 +9,7 @@ from discord.ext import commands
 class Memevoting(commands.Cog):
 
     def __init__(self, bot):
-        # Below is a sample of the current storage format of the meme channels and such for each guild.
+        # Below is a sample of the OLD storage format of the meme channels and such for each guild.
         # This should be migrated to a database at some point...
 
         # {
@@ -23,20 +24,35 @@ class Memevoting(commands.Cog):
         #     "last_scan": "2020-11-20T18:00:00"
         # }
 
+
+        # SQLite implementation - tuple
+        # ( 
+        # 0 guild_id:int, 
+        # 1 memechannel_id:int or 0, 
+        # 2 memeresultchannel_id:int or 0, 
+        # 3 meme_winner_role_id:int, 
+        # 4 last_scan:string (DateTime iso format)
+        # )
+
+
         self.bot = bot
         self.name = "Memevoting"
-        with open("cogs/cogfigs/Memevoting.json", "r+") as f:
-            self.data = json.load(f)
-        self.guild_ids = self.data["guild_ids"]
-        self.prev_scan = dt.datetime.fromisoformat(self.data["last_scan"])
+        # with open("cogs/cogfigs/Memevoting.json", "r+") as f:
+        #     self.data = json.load(f)
+        # self.data = db.get_data("SELECT * FROM memevoting", ()) --- not needed?
+        self.guild_ids = db.get_data("SELECT guild_id FROM memevoting", ())
+        # self.last_scan = dt.datetime.fromisoformat(self.data["last_scan"]) --add fix
         self.current_scan = dt.datetime.utcnow()
         self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
 
     @commands.Cog.listener()
     async def on_ready(self):
-        for guild_id in self.guild_ids:
-            memechannel = self.bot.get_channel(self.guild_ids[guild_id]["memechannel_id"])
-            messages = await memechannel.history(after=self.prev_scan).flatten()
+        for guild_id_tuple in self.guild_ids:
+            guild_data = await self.get_guild_data(guild_id_tuple)
+            # memechannel = self.bot.get_channel(self.guild_ids[guild_id]["memechannel_id"])
+            memechannel = self.bot.get_channel(guild_data[1])
+            last_scan = dt.datetime.fromisoformat(guild_data[4])
+            messages = await memechannel.history(after=last_scan).flatten()
             for message in messages:
                 if not message.author == self.bot.user:
                     await self.react_to_message(message)
@@ -45,34 +61,34 @@ class Memevoting(commands.Cog):
         await self.bot.wait_until_ready()
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.utcnow()
-            if dt.timedelta(2) < self.current_scan - self.prev_scan < dt.timedelta(7):
-                await self.remove_meme_roles()  # make this function find guild
+            for guild_id_tuple in self.guild_ids:
+                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM memevoting WHERE guild_id=?", guild_id_tuple)[0])
+                if dt.timedelta(2) < self.current_scan - last_scan < dt.timedelta(7):
+                    await self.remove_meme_roles()
+                if self.current_scan - last_scan > dt.timedelta(7):
+                    print("Scanning... ", self.current_scan - last_scan)
+                    await self.get_meme_contest_results(guild_id_tuple)
+                    last_scan += dt.timedelta(7)
+                    db.set_data("UPDATE memevoting SET last_scan=? WHERE guild_id=?", (dt.datetime.isoformat(last_scan), ) + guild_id_tuple)
 
-            if self.current_scan - self.prev_scan > dt.timedelta(7):
-                print("Scanning...", self.current_scan - self.prev_scan)
-                await self.get_meme_contest_results()
-                self.prev_scan += dt.timedelta(7)
-                with open("cogs/cogfigs/Memevoting.json", "w+") as f:
-                    self.data["last_scan"] = self.prev_scan.isoformat()
-                    json.dump(self.data, f, indent=2)
 
             await asyncio.sleep(60)
 
     @commands.Cog.listener()
     async def on_message(self, message):
+        guild_data = await self.get_guild_data((message.guild.id,))
         if message.author == self.bot.user:
             return
-        if str(message.channel.id) == str(
-                self.guild_ids[str(message.guild.id)]["memechannel_id"]) and message.author != self.bot.user:
+        if message.channel.id == guild_data[1]:
             await self.react_to_message(message)
-
+# -------------------------------------------------------------------=====
     async def get_result_embed(self, participant_msg, winner_or_loser, emoji=""):
         if winner_or_loser == "winner":
             head_title = "\U0001f923 This week's UlTiMaTe memes! \U0001f923"
             congrats_message = "Sent by memelord: "
-        elif winner_or_loser == "loser":
-            head_title = "\U0001F4A9 This week's ShItTeSt memes! \U0001F4A9"
-            congrats_message = "Sent by boring loser: "
+        # elif winner_or_loser == "loser":
+        #     head_title = "\U0001F4A9 This week's ShItTeSt memes! \U0001F4A9"
+        #     congrats_message = "Sent by boring loser: "
 
         embed = discord.Embed(title=head_title, colour=discord.Colour(0x4a90e2),
                               timestamp=dt.datetime.now(tz=dt.timezone.utc))
@@ -93,60 +109,62 @@ class Memevoting(commands.Cog):
         embed.description = main_content
         return embed
 
-    async def get_meme_contest_results(self):
-        for guild_id in self.guild_ids:
-            guild = self.bot.get_guild(int(guild_id))
-            meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
-            meme_winner_role = guild.get_role(int(self.guild_ids[guild_id]["meme_winner_role_id"]))
-            memechannel = guild.get_channel(int(self.guild_ids[guild_id]["memechannel_id"]))
-            memeresultchannel = guild.get_channel(int(self.guild_ids[guild_id]["memeresultchannel_id"]))
-            messages = await memechannel.history(after=self.prev_scan).flatten()
-            if not messages:
-                return
-            winners_messages, upvotes = await self.get_reaction_results(messages, "\U0001f44d")
-            # losers_messages, downvotes = await self.get_reaction_results(messages, "\U0001f44e")
+    async def get_meme_contest_results(self, guild_id_tuple):
+        guild_data = await self.get_guild_data(guild_id_tuple)
+
+        guild = self.bot.get_guild(guild_data[0])
+        memechannel = guild.get_channel(guild_data[1])
+        memeresultchannel = guild.get_channel(guild_data[2])
+        meme_winner_role = guild.get_role(guild_data[3])
+        last_scan = dt.datetime.fromisoformat(guild_data[4])
+        messages = await memechannel.history(after=last_scan).flatten()
+        if not messages:
+            return
+        winners_messages, upvotes = await self.get_reaction_results(messages, "\U0001f44d")
+        # losers_messages, downvotes = await self.get_reaction_results(messages, "\U0001f44e")
 
 
-            # TODO: tidy this up!
-            # loser_members = []
-            # for losers_message in losers_messages:
-            #     embed = await self.get_result_embed(losers_message, winner_or_loser="loser", emoji="\U0001f44e")
-            #     # await memechannel.send(content=f"**\U0001f44e {downvotes}**", embed=embed)
-            #     member = losers_message.author
-            #     if member not in loser_members:
-            #         loser_members.append(member)
-            #         try:
-            #             await member.add_roles(meme_loser_role, reason="meme contest")
-            #         except discord.Forbidden as e:
-            #             print(e + " - You do not have permission to add these roles.")
-            #         except discord.HTTPException as e:
-            #             print(e)
+        # TODO: tidy this up!
+        # loser_members = []
+        # for losers_message in losers_messages:
+        #     embed = await self.get_result_embed(losers_message, winner_or_loser="loser", emoji="\U0001f44e")
+        #     # await memechannel.send(content=f"**\U0001f44e {downvotes}**", embed=embed)
+        #     member = losers_message.author
+        #     if member not in loser_members:
+        #         loser_members.append(member)
+        #         try:
+        #             await member.add_roles(meme_loser_role, reason="meme contest")
+        #         except discord.Forbidden as e:
+        #             print(e + " - You do not have permission to add these roles.")
+        #         except discord.HTTPException as e:
+        #             print(e)
 
-            for winners_message in winners_messages:
-                embed = await self.get_result_embed(winners_message, winner_or_loser="winner", emoji="\U0001f44d")
-                if not memeresultchannel is None:  # clean this up
-                    await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
-                member = winners_message.author
-                # if member in loser_members:  # member can't be winner AND loser!
-                try:
+        for winners_message in winners_messages:
+            embed = await self.get_result_embed(winners_message, winner_or_loser="winner", emoji="\U0001f44d")
+            if not memeresultchannel is None:  # clean this up
+                await memeresultchannel.send(content=f"**\U0001f44d {upvotes}**", embed=embed)
+            member = winners_message.author
+            # if member in loser_members:  # member can't be winner AND loser!
+            try:
+                if meme_winner_role:
                     await member.add_roles(meme_winner_role, reason="meme contest")
-                except discord.Forbidden as e:
-                    print(e + " - You do not have permission to add these roles.")
-                except discord.HTTPException as e:
-                    print(e)
+            except discord.Forbidden as e:
+                print("Bot does not have permission to add these roles.")
+            except discord.HTTPException as e:
+                print("Unable to add roles!")
 
-    async def remove_meme_roles(self):
-        for guild_id in self.guild_ids:
-            guild = self.bot.get_guild(int(guild_id))
+    async def remove_meme_roles(self, guild_id):
+        for guild_id_tuple in self.guild_ids:
+            guild = self.bot.get_guild(guild_id_tuple[0])
 
             valid_roles = []
-            meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
-            if meme_loser_role:
-                valid_roles.append(meme_loser_role)
-            meme_winner_role = guild.get_role(int(self.guild_ids[guild_id]["meme_winner_role_id"]))
+            # meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
+            # if meme_loser_role:
+            #     valid_roles.append(meme_loser_role)
+            meme_winner_role = guild.get_role(db.get_data("SELECT meme_winner_role_id FROM memevoting WHERE guild_id=?", guild_id_tuple)[0])
             if meme_winner_role:
                 valid_roles.append(meme_winner_role)
-            memechannel = guild.get_channel(int(self.guild_ids[guild_id]["memechannel_id"]))
+            memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM memevoting WHERE guild_id=?", guild_id_tuple)[0])
 
             if not len(valid_roles) > 0:
                 continue
@@ -182,6 +200,11 @@ class Memevoting(commands.Cog):
                         results = [message]
                     max_reactions = reaction.count
         return results, max_reactions - 1
+
+    @staticmethod
+    async def get_guild_data(guild_id_tuple):
+        data = db.get_data("SELECT * FROM memevoting WHERE guild_id=? LIMIT 1", guild_id_tuple)
+        return data
 
 
 def setup(bot):
