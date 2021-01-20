@@ -60,11 +60,14 @@ class Configs(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def listserious(self, ctx):
-        serious_channels = utils.get_serious_channel_data()[str(ctx.guild.id)]
-        print(serious_channels)
-        reply = "**Serious voice channels in this server:**\n"
-        for serious_channel in serious_channels:
-            reply += f"<#{serious_channel}>\n"
+        serious_channels = utils.get_serious_channel_data(ctx.guild.id)
+        # print(serious_channels)
+        if serious_channels:
+            reply = "**Serious voice channels in this server:**\n"
+            for serious_channel in serious_channels:
+                reply += f"<#{serious_channel}>\n"
+        else:
+            reply = "**There are no serious channels in this server.**"
         await ctx.send(reply)
 
 
