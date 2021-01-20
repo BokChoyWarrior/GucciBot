@@ -63,9 +63,10 @@ class Memevoting(commands.Cog):
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.utcnow()
             for guild_id_tuple in self.guild_ids:
-                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
+                guild_id = guild_id_tuple[0]
+                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM guild_info WHERE guild_id=?", guild_id_tuple))
                 if dt.timedelta(2) < self.current_scan - last_scan < dt.timedelta(7):
-                    await self.remove_meme_roles()
+                    await self.remove_meme_roles(guild_id)
                 if self.current_scan - last_scan > dt.timedelta(7):
                     print("Scanning... ", self.current_scan - last_scan)
                     await self.get_meme_contest_results(guild_id_tuple)
@@ -82,7 +83,7 @@ class Memevoting(commands.Cog):
             return
         if message.channel.id == guild_data[1]:
             await self.react_to_message(message)
-# -------------------------------------------------------------------=====
+
     async def get_result_embed(self, participant_msg, winner_or_loser, emoji=""):
         if winner_or_loser == "winner":
             head_title = "\U0001f923 This week's UlTiMaTe memes! \U0001f923"
@@ -155,28 +156,21 @@ class Memevoting(commands.Cog):
                 print("Unable to add roles!")
 
     async def remove_meme_roles(self, guild_id):
-        for guild_id_tuple in self.guild_ids:
-            guild = self.bot.get_guild(guild_id_tuple[0])
+        guild = self.bot.get_guild(guild_id)
+        
+        meme_winner_role = guild.get_role(db.get_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", (guild_id,)))
+        if not meme_winner_role:
+            print("Could not find meme winner role for guild: ", guild)
+            return
 
-            valid_roles = []
-            # meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
-            # if meme_loser_role:
-            #     valid_roles.append(meme_loser_role)
-            meme_winner_role = guild.get_role(db.get_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
-            if meme_winner_role:
-                valid_roles.append(meme_winner_role)
-            memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
-
-            if not len(valid_roles) > 0:
-                continue
-
-            for member in memechannel.members:
-                try:
-                    await member.remove_roles(*valid_roles, reason="Meme contest")
-                except discord.Forbidden:
-                    pass
-                except discord.HTTPException:
-                    pass
+        memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", (guild_id,)))
+        for member in memechannel.members:
+            try:
+                await member.remove_roles(meme_winner_role, reason="Meme contest")
+            except discord.Forbidden:
+                pass
+            except discord.HTTPException:
+                pass
 
     @staticmethod
     async def react_to_message(message):
