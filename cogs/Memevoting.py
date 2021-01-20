@@ -157,12 +157,12 @@ class Memevoting(commands.Cog):
 
     async def remove_meme_roles(self, guild_id):
         guild = self.bot.get_guild(guild_id)
+        meme_winner_role_id = db.get_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", (guild_id,))
+        meme_winner_role = guild.get_role(int(meme_winner_role_id))
         
-        meme_winner_role = guild.get_role(db.get_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", (guild_id,)))
         if not meme_winner_role:
-            print("Could not find meme winner role for guild: ", guild)
+            print("Could not find meme winner role for guild:", guild)
             return
-
         memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", (guild_id,)))
         for member in memechannel.members:
             try:
