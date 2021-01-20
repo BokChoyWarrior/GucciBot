@@ -64,7 +64,7 @@ class Memevoting(commands.Cog):
             self.current_scan = dt.datetime.utcnow()
             for guild_id_tuple in self.guild_ids:
                 guild_id = guild_id_tuple[0]
-                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM guild_info WHERE guild_id=?", guild_id_tuple))
+                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
                 if dt.timedelta(2) < self.current_scan - last_scan < dt.timedelta(7):
                     await self.remove_meme_roles(guild_id)
                 if self.current_scan - last_scan > dt.timedelta(7):
