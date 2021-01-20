@@ -32,6 +32,7 @@ class Memevoting(commands.Cog):
         # 2 memeresultchannel_id:int or 0, 
         # 3 meme_winner_role_id:int, 
         # 4 last_scan:string (DateTime iso format)
+        # 5 serious_channels:string  "channel_id1 channelid2 chanelid3 " etc
         # )
 
 
@@ -40,7 +41,7 @@ class Memevoting(commands.Cog):
         # with open("cogs/cogfigs/Memevoting.json", "r+") as f:
         #     self.data = json.load(f)
         # self.data = db.get_data("SELECT * FROM memevoting", ()) --- not needed?
-        self.guild_ids = db.get_data("SELECT guild_id FROM memevoting", ())
+        self.guild_ids = db.get_data("SELECT guild_id FROM guild_info", ())
         # self.last_scan = dt.datetime.fromisoformat(self.data["last_scan"]) --add fix
         self.current_scan = dt.datetime.utcnow()
         self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
@@ -62,14 +63,14 @@ class Memevoting(commands.Cog):
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.utcnow()
             for guild_id_tuple in self.guild_ids:
-                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM memevoting WHERE guild_id=?", guild_id_tuple)[0])
+                last_scan = dt.datetime.fromisoformat(db.get_data("SELECT last_scan FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
                 if dt.timedelta(2) < self.current_scan - last_scan < dt.timedelta(7):
                     await self.remove_meme_roles()
                 if self.current_scan - last_scan > dt.timedelta(7):
                     print("Scanning... ", self.current_scan - last_scan)
                     await self.get_meme_contest_results(guild_id_tuple)
                     last_scan += dt.timedelta(7)
-                    db.set_data("UPDATE memevoting SET last_scan=? WHERE guild_id=?", (dt.datetime.isoformat(last_scan), ) + guild_id_tuple)
+                    db.set_data("UPDATE guild_info SET last_scan=? WHERE guild_id=?", (dt.datetime.isoformat(last_scan), ) + guild_id_tuple)
 
 
             await asyncio.sleep(60)
@@ -161,10 +162,10 @@ class Memevoting(commands.Cog):
             # meme_loser_role = guild.get_role(int(self.guild_ids[guild_id]["meme_loser_role_id"]))
             # if meme_loser_role:
             #     valid_roles.append(meme_loser_role)
-            meme_winner_role = guild.get_role(db.get_data("SELECT meme_winner_role_id FROM memevoting WHERE guild_id=?", guild_id_tuple)[0])
+            meme_winner_role = guild.get_role(db.get_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
             if meme_winner_role:
                 valid_roles.append(meme_winner_role)
-            memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM memevoting WHERE guild_id=?", guild_id_tuple)[0])
+            memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", guild_id_tuple)[0])
 
             if not len(valid_roles) > 0:
                 continue
@@ -203,7 +204,7 @@ class Memevoting(commands.Cog):
 
     @staticmethod
     async def get_guild_data(guild_id_tuple):
-        data = db.get_data("SELECT * FROM memevoting WHERE guild_id=? LIMIT 1", guild_id_tuple)
+        data = db.get_data("SELECT * FROM guild_info WHERE guild_id=?", guild_id_tuple)
         return data
 
 
