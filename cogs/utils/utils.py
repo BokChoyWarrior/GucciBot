@@ -1,9 +1,9 @@
 import asyncio
 import discord
 import random
-import json
 from contextlib import contextmanager
 from time import perf_counter
+from cogs.utils import db
 
 
 @contextmanager
@@ -13,43 +13,38 @@ def measure_time(description: str) -> None:
     print(f"'{description}' took: {(perf_counter() - t1):.04f} s")
 
 
-def get_serious_channel_data():
-    try:
-        fp = "cogs/cogfigs/SeriousChannels.json"
-        with open(fp) as f:
-            data = json.load(f)
-    except FileNotFoundError as e:
-        print(e, "file path is:", fp, sep=" ")
+def get_serious_channel_data(guild_id):
+    data = db.get_data("SELECT serious_channels FROM guild_info WHERE guild_id=?", (guild_id,))[0]
+    data = data.split()
     return data
 
 
 def channel_is_serious(guild_id, channel_id, data=None):
     if not data:
-        data = get_serious_channel_data()
-        print(type(channel_id))
-        print(data[guild_id])
-    if channel_id in data[guild_id]:
-        print("Found channel")
+        data = get_serious_channel_data(guild_id)
+    # print(type(channel_id))
+    # print(data[guild_id])
+    if str(channel_id) in data:
+        # print("Found channel")
         return True
     else:
-        print("Didnt find channel")
+        # print("Didnt find channel")
         return False
 
 
 def change_seriousness(ctx, channel_id):
     channel_id = str(channel_id)
-    guild_id = str(ctx.guild.id)
-    data = get_serious_channel_data()
-
-    with open("cogs/cogfigs/SeriousChannels.json", "w+") as f:
-        if channel_is_serious(guild_id, channel_id, data):
-            data[guild_id].remove(channel_id)
-            serious = False
-        else:
-            data[guild_id].append(channel_id)
-            serious = True
-        json.dump(data, f, indent=2)
-        return serious
+    guild_id = ctx.guild.id
+    data = get_serious_channel_data(guild_id)
+    if channel_is_serious(guild_id, channel_id, data=data):
+        data.remove(channel_id)
+        serious = False
+    else:
+        data.append(channel_id)
+        serious = True
+    data = " ".join(data)
+    db.set_data("UPDATE guild_info SET serious_channels=? WHERE guild_id=?", (data, guild_id))
+    return serious
 
 
 def check_channel_existence_and_type(channel_id, guild):
