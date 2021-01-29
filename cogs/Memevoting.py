@@ -119,7 +119,7 @@ class Memevoting(commands.Cog):
         memeresultchannel = guild.get_channel(guild_data[2])
         meme_winner_role = guild.get_role(guild_data[3])
         last_scan = dt.datetime.fromisoformat(guild_data[4])
-        messages = await memechannel.history(after=last_scan).flatten()
+        messages = await memechannel.history(after=last_scan, before=(last_scan + dt.timedelta(7))).flatten()
         if not messages:
             return
         winners_messages, upvotes = await self.get_reaction_results(messages, "\U0001f44d")
