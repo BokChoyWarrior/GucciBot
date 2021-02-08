@@ -163,7 +163,7 @@ class Memevoting(commands.Cog):
         memechannel = guild.get_channel(db.get_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", (guild_id,))[0])
         
         if not meme_winner_role or not memechannel:
-            print("Either the bot could not find meme winner role or memechannel doesnt exist in guild:", guild)
+            # print("Either the bot could not find meme winner role or memechannel doesnt exist in guild:", guild)
             return
         for member in memechannel.members:
             try:
