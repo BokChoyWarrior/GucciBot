@@ -162,8 +162,8 @@ class Audio(commands.Cog, name="Audio"):
             try:
                 with utils.measure_time("Saving gtts mp3"):
                     gttsobj.save("sounds/say.mp3")
-            except:
-                await ctx.send("There was an error processing your request. Most likely the language code used no longer works - please try another one.", delete_after=10)
+            except Exception as e:
+                await ctx.send("There was an error processing your request. Most likely the language code used no longer works - please try another one.\n\nError: " + e, delete_after=10)
                 return
 
             await utils.play_files("sounds/say.mp3", ctx)
