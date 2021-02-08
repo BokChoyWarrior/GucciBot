@@ -150,26 +150,26 @@ class Audio(commands.Cog, name="Audio"):
             try:
                 gttsobj = gTTS(text=text, lang=lang, slow=False)
             except AssertionError:
-                await ctx.send("Invalid text. Please try something else.", delete_after=10)
+                await ctx.send("Invalid text. Please try something else.", delete_after=60)
                 return
             except ValueError:
-                await ctx.send(f"'{lang}' is not a supported language code. Type `!saylanguages` to see a list.", delete_after=10)
+                await ctx.send(f"'{lang}' is not a supported language code. Type `!saylanguages` to see a list.", delete_after=60)
                 return
             except RuntimeError:
-                await ctx.send("There was an error while loading languages dictionary. Please try again later.", delete_after=10)
+                await ctx.send("There was an error while loading languages dictionary. Please try again later.", delete_after=60)
                 return
 
             try:
                 with utils.measure_time("Saving gtts mp3"):
                     gttsobj.save("sounds/say.mp3")
             except Exception as e:
-                await ctx.send("There was an error processing your request. Most likely the language code used no longer works - please try another one.\n\nError: " + e, delete_after=10)
+                await ctx.send(f"There was an error processing your request. Most likely the language code used no longer works - please try another one.\n\nTechnical details:\n`{e}`", delete_after=60)
                 return
 
             await utils.play_files("sounds/say.mp3", ctx)
         else:
             print("User not in voice channel")
-            await ctx.send(content="Please join a voice channel to use this command.", delete_after=10)
+            await ctx.send(content="Please join a voice channel to use this command.", delete_after=60)
 
     @commands.command()
     async def saylanguages(self, ctx):
