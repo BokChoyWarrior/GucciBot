@@ -58,55 +58,58 @@ def check_channel_existence_and_type(channel_id, guild):
     return False
 
 
-async def play_files(files, ctx, message=None, channel=None):
+async def play_files(files, ctx):
     if isinstance(files, str):
         files_to_play = [files]
     else:
         files_to_play = files
 
-    if channel:
-        voice_channel = channel
+    if type(ctx) == discord.ext.commands.Context:
+        if ctx.author.voice:
+            voice_channel = ctx.author.voice.channel
+        else:
+            await ctx.send("You are not connected to a voice channel.", delete_after=10)
+    elif type(ctx) == discord.VoiceChannel:
+        voice_channel = ctx
     else:
-        voice_channel = message.author.voice.channel
-        ctx = message.channel
+        print("Invalid argument provided (ctx):\n" + repr(ctx))
+        return
 
-    if channel_is_serious(voice_channel.id):
+    if channel_is_serious(voice_channel.guild.id, voice_channel.id):
         return
 
     voice_join_failures = 0
+    if not isinstance(voice_channel, discord.VoiceProtocol):
+        voice_join_failures += 1
+        if voice_join_failures > 3:
+            return
+        try:
+            voice_channel = await voice_channel.connect()
+            # catching most common errors that can occur while playing effects
+        except discord.Forbidden:
+            await ctx.send(
+                "Command raised error \"403 Forbidden\". Please check if bot has permission to join and speak in voice "
+                "channel")
+            return
+        except asyncio.TimeoutError:
+            await ctx.send(
+                "There was an error while joining channel (Timeout). It's possible that either Discord API or bot host "
+                "has latency/connection issues. Please try again later.")
+            return
+        except discord.ClientException:
+            await ctx.send("I am already playing a sound! Please wait until the current sound is done playing!")
+            return
+        except Exception as e:
+            await ctx.send(
+                "There was an error processing your request. Please try again. If issues continues, contact bot owner.")
+            print(f'Error trying to join a voicechannel: {e}')
+            return
+    
+    rick_o_meter = random.randint(1, 100)
+    if rick_o_meter == 1:
+        files_to_play = ["sounds/rickroll.mp3"]
 
     for file in files_to_play:
-        if not isinstance(voice_channel, discord.VoiceProtocol):
-            voice_join_failures += 1
-            if voice_join_failures > 3:
-                return
-            print("Not connected to a voice protocol")
-            try:
-                voice_channel = await voice_channel.connect()
-                # catching most common errors that can occur while playing effects
-            except discord.Forbidden:
-                await ctx.send(
-                    "Command raised error \"403 Forbidden\". Please check if bot has permission to join and speak in voice "
-                    "channel")
-                return
-            except asyncio.TimeoutError:
-                await ctx.send(
-                    "There was an error while joining channel (Timeout). It's possible that either Discord API or bot host "
-                    "has latency/connection issues. Please try again later.")
-                return
-            except discord.ClientException:
-                await ctx.send("I am already playing a sound! Please wait until the current sound is done playing!")
-                return
-            except Exception as e:
-                await ctx.send(
-                    "There was an error processing your request. Please try again. If issues continues, contact bot owner.")
-                print(f'Error trying to join a voicechannel: {e}')
-                return
-
-        rick_o_meter = random.randint(1, 100)
-        if rick_o_meter == 1:
-            filename = "sounds/rickroll.mp3"
-
         try:
             source = discord.FFmpegPCMAudio(file)
 
@@ -117,7 +120,7 @@ async def play_files(files, ctx, message=None, channel=None):
                 "over a file.")
 
         try:
-            voice_channel.play(source, after=lambda: print("played doot"))
+            voice_channel.play(source)
             # catching most common errors that can occur while playing effects
         except discord.Forbidden:
             await ctx.send("There was an issue playing a sound effect. please check if bot has speak permission")
@@ -140,9 +143,10 @@ async def play_files(files, ctx, message=None, channel=None):
         while voice_channel.is_playing():
             await asyncio.sleep(0.1)
 
-    voice_channel.stop()
+        voice_channel.stop()
 
     await voice_channel.disconnect()
+    voice_channel.cleanup()
 
 
 def message_contains(words, message):

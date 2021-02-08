@@ -140,7 +140,7 @@ class Audio(commands.Cog, name="Audio"):
                 gttsobj = gTTS(text=text, lang=lang, slow=False)
             with utils.measure_time("Saving gtts mp3"):
                 gttsobj.save("sounds/say.mp3")
-            await utils.play_files("sounds/say.mp3", message=ctx)
+            await utils.play_files("sounds/say.mp3", ctx)
         else:
             print("User not in voice channel")
             await ctx.send(content="Please join a voice channel to use this command.", delete_after=10)
