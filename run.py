@@ -10,15 +10,16 @@ import shutil
 # from cogs.utils import db
 
 # check for ffmpeg
-def check_ffmpeg():
-    ffmpeg_ver = shutil.which("ffmpeg")
-    if ffmpeg_ver is None:
-        print("FFMPEG not found - please ensure it is installed within the venv AND the system+path")
+def check_for_software(software):
+    software_ver = shutil.which(software)
+    if software_ver is None:
+        print(f"{software} not found - please ensure it is installed within the venv AND/OR the system+path")
     else:
-        print("FFMPEG found: " + str(ffmpeg_ver))
+        print(f"{software} found: " + str(software_ver))
 
 
-check_ffmpeg()
+check_for_software("ffmpeg")
+check_for_software("espeak")
 
 logger = logging.getLogger('discord')
 logger.setLevel(logging.DEBUG)
