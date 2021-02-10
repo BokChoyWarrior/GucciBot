@@ -12,7 +12,7 @@ class Audio(commands.Cog, name="Audio"):
     def __init__(self, bot):
         self.bot = bot
         self.name = "Audio"
-        self.tts_engine = pyttsx3.init()
+        self.playing = False
 
     @commands.command()
     async def stop(self, ctx):
@@ -131,20 +131,30 @@ class Audio(commands.Cog, name="Audio"):
     Where your *text* is enclosed in quotes.""")
     async def say(self, ctx, text, lang="en"):
         """Speaks your message with pyttsx3 text-to-speech."""
-        if ctx.message.author.voice is not None:
-            try:
-                with utils.measure_time("Creating pyttsx3 mp3"):
-                    self.tts_engine.save_to_file(text, "sounds/say.mp3")
-                    self.tts_engine.runAndWait()
-            except Exception as e:
-                await ctx.send(f"There was an error processing your request.\n\nTechnical details:\n`{e}`", delete_after=60)
-                return
+        try:
+            if ctx.message.author.voice is not None and not self.playing:
+                try:
+                    self.playing = True
+                    with utils.measure_time("Creating pyttsx3 mp3"):
+                        tts_engine = pyttsx3.init()
+                        tts_engine.save_to_file(text, "sounds/say.mp3")
+                        print("Saved to file")
+                        tts_engine.runAndWait()
+                        print("Ran and waited")
 
-            await utils.play_files("sounds/say.mp3", ctx)
-        else:
-            print("User not in voice channel")
-            await ctx.send(content="Please join a voice channel to use this command.", delete_after=60)
-
+                    await utils.play_files("sounds/say.mp3", ctx)
+                except Exception as e:
+                    await ctx.send(content=f"There was an error processing your request.\n\nTechnical details:\n`{e}`", delete_after=60)
+                    return
+            else:
+                if self.playing:
+                    await ctx.send(content="Please wait until the current sound is finished playing, or type `!stop` to end it.", delete_after=60)
+                elif ctx.message.author.voice:
+                    await ctx.send(content="Cannot play sound.", delete_after=60)
+        except Exception as e:
+            print(e)
+        finally:
+            self.playing = False
 
 def setup(bot):
     bot.add_cog(Audio(bot))
