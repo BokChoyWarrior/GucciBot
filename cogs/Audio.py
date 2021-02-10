@@ -3,7 +3,7 @@ import random
 from .utils import utils
 from discord.ext import commands
 
-from gtts import gTTS, tts, lang as gtts_lang
+import pyttsx3
 
 prefix = "!"
 
@@ -12,17 +12,7 @@ class Audio(commands.Cog, name="Audio"):
     def __init__(self, bot):
         self.bot = bot
         self.name = "Audio"
-
-        lang_dict = gtts_lang.tts_langs()
-        sorted_tuples = sorted(lang_dict.items(), key=lambda item: item[1])
-        
-        sorted_langs = {k: v for k, v in sorted_tuples}
-
-        formatted_languages = ""
-        for k in sorted_langs:
-            sep = (6 - len(k))*" "
-            formatted_languages += f"{k}{sep}{sorted_langs[k]}\n"
-        self.formatted_languages = formatted_languages
+        self.tts_engine = pyttsx3.init()
 
     @commands.command()
     async def stop(self, ctx):
@@ -135,35 +125,19 @@ class Audio(commands.Cog, name="Audio"):
         await utils.play_files("sounds/Koksockar.mp3", ctx)
 
     """ SAY COMMAND """
-    @commands.command(help="Speaks your message with Google text-to-speech.",
-                      usage="""\"text\" language-tag
+    @commands.command(help="Speaks your message with pyttsx3 text-to-speech.",
+                      usage="""\"text\"
     
-    Where your *text* is enclosed in quotes and *language-tag* is an IETF lnguage tag such as 
-        -"en"
-        -"fr"(french)
-        -"es"(spanish) etc.
-        
-    Leave no language tag for default (en)""")
+    Where your *text* is enclosed in quotes.""")
     async def say(self, ctx, text, lang="en"):
-        """Speaks your message with Google text-to-speech."""
+        """Speaks your message with pyttsx3 text-to-speech."""
         if ctx.message.author.voice is not None:
             try:
-                gttsobj = gTTS(text=text, lang=lang, slow=False)
-            except AssertionError:
-                await ctx.send("Invalid text. Please try something else.", delete_after=60)
-                return
-            except ValueError:
-                await ctx.send(f"'{lang}' is not a supported language code. Type `!saylanguages` to see a list.", delete_after=60)
-                return
-            except RuntimeError:
-                await ctx.send("There was an error while loading languages dictionary. Please try again later.", delete_after=60)
-                return
-
-            try:
-                with utils.measure_time("Saving gtts mp3"):
-                    gttsobj.save("sounds/say.mp3")
+                with utils.measure_time("Creating pyttsx3 mp3"):
+                    self.tts_engine.save_to_file(text, "sounds/say.mp3")
+                    self.tts_engine.runAndWait()
             except Exception as e:
-                await ctx.send(f"There was an error processing your request. Most likely the language code used no longer works - please try another one.\n\nTechnical details:\n`{e}`", delete_after=60)
+                await ctx.send(f"There was an error processing your request.\n\nTechnical details:\n`{e}`", delete_after=60)
                 return
 
             await utils.play_files("sounds/say.mp3", ctx)
@@ -171,9 +145,6 @@ class Audio(commands.Cog, name="Audio"):
             print("User not in voice channel")
             await ctx.send(content="Please join a voice channel to use this command.", delete_after=60)
 
-    @commands.command()
-    async def saylanguages(self, ctx):
-        await ctx.send(f"```\n{self.formatted_languages}```", delete_after=60)
 
 def setup(bot):
     bot.add_cog(Audio(bot))
