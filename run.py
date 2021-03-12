@@ -43,6 +43,7 @@ initial_extensions = [
     "MyCaptionBot",
     "Timer",
     "Configs",
+    "Birthday",
     # "ImageTools",
 
     # "Basics2"
@@ -87,6 +88,13 @@ async def on_message(message):
 async def on_command(ctx):
     pass
 
+@bot.event
+async def on_error(event, *args, **kwargs):
+    embed = discord.Embed(title=':x: Event Error', colour=0xe74c3c) #Red
+    embed.add_field(name='Event', value=event)
+    embed.description = '```py\n%s\n```' % traceback.format_exc()
+    embed.timestamp = datetime.utcnow()
+    await bot.AppInfo.owner.send(embed=embed)
 
 if __name__ == '__main__':
     for extension in initial_extensions:

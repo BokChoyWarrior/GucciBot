@@ -28,7 +28,7 @@ def get_data(command, args_tuple):
     c.execute(command, args_tuple)
     data = c.fetchall()
 
-    if len(data) > 1:
+    if len(data) == 1:
         return data
     else:
         return data[0]
