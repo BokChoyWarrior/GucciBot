@@ -35,14 +35,14 @@ bot = commands.Bot(command_prefix=config.prefix, description="Welcome to GucciBo
                    case_insensitive=True, intents=intents)
 
 initial_extensions = [
-    'Fun',
-    'Audio',
-    "Basics",
-    "Replies",
-    "Memevoting",
-    "MyCaptionBot",
-    "Timer",
-    "Configs",
+    # 'Fun',
+    # 'Audio',
+    # "Basics",
+    # "Replies",
+    # "Memevoting",
+    # "MyCaptionBot",
+    # "Timer",
+    # "Configs",
     "Birthday",
     # "ImageTools",
 
