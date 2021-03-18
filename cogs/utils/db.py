@@ -1,4 +1,5 @@
-import sqlite3
+import aiosqlite
+import asyncio
 
 # Notes on SQLite and SQLite3
 # ===========================
@@ -15,20 +16,29 @@ import sqlite3
 # 4 last_scan:string (DateTime iso format)
 # 5 serious_channels:string  "channel_id1 channelid2 chanelid3 " etc
 # )
+conn = None
+c = None
 
-conn = sqlite3.connect("gucci.db")
-c = conn.cursor()
+async def main():
+    global conn, c
+    conn = await aiosqlite.connect("gucci.db")
+    c = await conn.cursor()
 
-def set_data(command, args_tuple):
-    with conn:
-        conn.execute(command, args_tuple)
+async def set_data(command, args_tuple):
+    """simply executes an SQL query"""
+    await conn.execute(command, args_tuple)
+    await conn.commit()
 
-def get_data(command, args_tuple):
-    """Returns the sole tuple if it is the only value in the list, otherwise returns list of tuples."""
-    c.execute(command, args_tuple)
-    data = c.fetchall()
+async def get_all_data(command, args_tuple):
+    """Returns a list of tuples (rows)."""
+    await c.execute(command, args_tuple)
+    rows = await c.fetchall()
+    return rows
 
-    if len(data) > 1:
-        return data
-    else:
-        return data[0]
+async def get_one_data(command, args_tuple):
+    """Returns a list of tuples (rows)."""
+    await c.execute(command, args_tuple)
+    row = await c.fetchone()
+    return row
+
+asyncio.run(main())
