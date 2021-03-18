@@ -41,19 +41,20 @@ bot = commands.Bot(command_prefix=prefix, description="Welcome to GucciBot!\nCom
 bot.help_command = PrettyHelp(active_time=120.0, color=EMBED_COLOUR)
 # bot.help_command = commands.DefaultHelpCommand()
 initial_extensions = [
-    # 'Fun',
-    # 'Audio',
-    # "Basics",
-    # "Replies",
-    # "Memevoting",
-    # "MyCaptionBot",
-    # "Timer",
-    # "Configs",
+    'Fun',
+    'Audio',
+    "Basics",
+    "Replies",
+    "Memevoting",
+    "MyCaptionBot",
+    "Timer",
+    "Configs",
     "Birthday",
-    # "ImageTools",
 
     "CommandErrorHandler",
+    
     # "Basics2"
+    # "ImageTools",
 ]
 
 # class MyHelpCommand(commands.MinimalHelpCommand):
