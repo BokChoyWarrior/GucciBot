@@ -21,7 +21,7 @@ async def _set_birthday(user_id, iso_birthday):
     await db.set_data("INSERT OR REPLACE INTO users VALUES (?, ?)", (user_id, iso_birthday,))
 
 async def _get_birthday(user_id):
-    birthday = (await db.get_one_data("SELECT bday_date FROM users WHERE id = ?", (user_id,)))[0]
+    birthday = (await db.get_one_data("SELECT bday_date FROM users WHERE id = ?", (user_id,)))
     return birthday
 
 async def _set_birthday_channel_id(guild_id, channel_id):
