@@ -51,17 +51,18 @@ class Memevoting(commands.Cog):
         self.name = "Memevoting"
 
         self.guild_ids = []
-        guild_id_tuples = await db.get_all_data("SELECT guild_id FROM guild_info", ())
-        for guild_id_tuple in guild_id_tuples:
-            self.guild_ids.append(guild_id_tuple[0])
 
         self.current_scan = dt.datetime.utcnow()
         self.bg_task = self.bot.loop.create_task(self.meme_contest_bg_task())
 
     @commands.Cog.listener()
     async def on_ready(self):
-        for guild_id_tuple in self.guild_ids:
-            guild_data = await get_guild_data(guild_id_tuple)
+        guild_id_tuples = await db.get_all_data("SELECT guild_id FROM guild_info", ())
+        for guild_id_tuple in guild_id_tuples:
+            self.guild_ids.append(guild_id_tuple[0])
+
+        for guild_id in self.guild_ids:
+            guild_data = await get_guild_data(guild_id)
             memechannel = self.bot.get_channel(guild_data[1])
             last_scan = dt.datetime.fromisoformat(guild_data[4])
             messages = await memechannel.history(after=last_scan).flatten()
@@ -89,7 +90,7 @@ class Memevoting(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        guild_data = await get_guild_data((message.guild.id,)) # this should be cached somewhere!!!!!!!!! TODO TODO TODO
+        guild_data = await get_guild_data(message.guild.id) # this should be cached somewhere!!!!!!!!! TODO TODO TODO
 
         if message.author == self.bot.user:
             return
