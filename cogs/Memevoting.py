@@ -4,9 +4,11 @@ import json
 from cogs.utils import db
 import discord
 from discord.ext import commands
+import traceback, sys
+from constants import ZERO_WIDTH_CHAR
 
 async def get_guild_data(guild_id):
-    data = await db.get_one_data("SELECT guild_id, memechannel_id, memeresultchannel_id, meme_winner_role_id, last_scan FROM guild_info WHERE guild_id=?", (guild_id,))
+    data = await db.get_one_data("SELECT guild_id, memechannel_id, memeresultchannel_id, meme_winner_role_id, last_scan FROM guild_info WHERE guild_id=?", (guild_id, ))
     return data
 
 async def react_to_message(message):
@@ -75,7 +77,7 @@ class Memevoting(commands.Cog):
         while not self.bot.is_closed():
             self.current_scan = dt.datetime.utcnow()
             for guild_id in self.guild_ids:
-                last_scan_iso = (await db.get_one_data("SELECT last_scan FROM guild_info WHERE guild_id=?", (guild_id)))[0]
+                last_scan_iso = (await db.get_one_data("SELECT last_scan FROM guild_info WHERE guild_id=?", (guild_id,)))[0]
                 last_scan = dt.datetime.fromisoformat(last_scan_iso)
                 if dt.timedelta(2) < self.current_scan - last_scan < dt.timedelta(7):
                     await self.remove_meme_role(guild_id)
@@ -85,15 +87,14 @@ class Memevoting(commands.Cog):
                     last_scan += dt.timedelta(7)
                     await db.set_data("UPDATE guild_info SET last_scan=? WHERE guild_id=?", (dt.datetime.isoformat(self.current_scan), guild_id))
 
-
             await asyncio.sleep(60)
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        guild_data = await get_guild_data(message.guild.id) # this should be cached somewhere!!!!!!!!! TODO TODO TODO
-
-        if message.author == self.bot.user:
+        if message.author.bot:
             return
+
+        guild_data = (await get_guild_data(int(message.guild.id))) # this should be cached somewhere!!!!!!!!! TODO TODO TODO
         if message.channel.id == guild_data[1]:
             await react_to_message(message)
 
@@ -116,7 +117,7 @@ class Memevoting(commands.Cog):
                 embed.set_image(url=attachment.url)
             main_content = f"[{attachment.filename}]({attachment.url})"
 
-        embed.add_field(name=f"**{congrats_message}{participant_msg.author.mention}!**", value=f"**[Link to message]({participant_msg.jump_url})**")
+        embed.add_field(name=ZERO_WIDTH_CHAR, value=f"**{congrats_message}{participant_msg.author.mention}!**\n**[Link to message]({participant_msg.jump_url})**", inline=False)
 
         embed.description = main_content
         return embed
@@ -152,10 +153,10 @@ class Memevoting(commands.Cog):
 
         guild = self.bot.get_guild(guild_id)
 
-        meme_winner_role_id = (await db.get_one_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", (guild_id,))[0])
+        meme_winner_role_id = (await db.get_one_data("SELECT meme_winner_role_id FROM guild_info WHERE guild_id=?", (guild_id,)))[0]
         meme_winner_role = guild.get_role(meme_winner_role_id)
 
-        memechannel_id = (await db.get_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", (guild_id,)))[0]
+        memechannel_id = (await db.get_one_data("SELECT memechannel_id FROM guild_info WHERE guild_id=?", (guild_id,)))[0]
         memechannel = guild.get_channel(memechannel_id)
 
         if not (meme_winner_role and memechannel):

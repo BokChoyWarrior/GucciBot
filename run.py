@@ -8,10 +8,6 @@ import shutil
 from pretty_help import PrettyHelp
 from constants import EMBED_COLOUR
 
-
-
-# from cogs.utils import db
-
 # check for ffmpeg
 def check_for_software(software):
     software_ver = shutil.which(software)

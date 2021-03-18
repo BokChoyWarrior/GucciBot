@@ -19,26 +19,34 @@ import asyncio
 conn = None
 c = None
 
-async def main():
+# TODO: change to context manager
+async def db_connect():
     global conn, c
     conn = await aiosqlite.connect("gucci.db")
-    c = await conn.cursor()
+    return conn
 
 async def set_data(command, args_tuple):
     """simply executes an SQL query"""
+    conn = await db_connect()
     await conn.execute(command, args_tuple)
     await conn.commit()
+    await conn.close()
 
 async def get_all_data(command, args_tuple):
     """Returns a list of tuples (rows)."""
+    conn = await db_connect()
+    c = await conn.cursor()
     await c.execute(command, args_tuple)
     rows = await c.fetchall()
+    await conn.close()
     return rows
 
 async def get_one_data(command, args_tuple):
     """Returns a list of tuples (rows)."""
+    conn = await db_connect()
+    c = await conn.cursor()
     await c.execute(command, args_tuple)
     row = await c.fetchone()
+    await conn.commit()
+    await conn.close()
     return row
-
-asyncio.run(main())

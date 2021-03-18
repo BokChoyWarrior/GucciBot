@@ -24,13 +24,6 @@ async def _get_birthday(user_id):
     birthday = (await db.get_one_data("SELECT bday_date FROM users WHERE id = ?", (user_id,)))[0]
     return birthday
 
-
-
-
-
-
-        
-
 async def _set_birthday_channel_id(guild_id, channel_id):
     await db.set_data("UPDATE guild_info SET bday_channel_id=? WHERE guild_id=?", (channel_id, guild_id,))
 
