@@ -22,9 +22,9 @@ async def _set_birthday(user_id, iso_birthday):
 
 async def _get_birthday(user_id):
     birthday = (await db.get_one_data("SELECT bday_date FROM users WHERE id = ?", (user_id,)))
-    if birthday == None or len(birthday) == 0:
+    if birthday == None or birthday[0] == None:
         return None
-    return birthday
+    return birthday[0]
 
 async def _set_birthday_channel_id(guild_id, channel_id):
     await db.set_data("UPDATE guild_info SET bday_channel_id=? WHERE guild_id=?", (channel_id, guild_id,))
@@ -227,7 +227,7 @@ class Birthday(commands.Cog):
                 birthday_msg = ""
                 visible_msg = ""
                 if isinstance(ctx.channel, discord.DMChannel):
-                    birthday_msg = "Your current birthday is 🎉 **" + _beautify_date(birthday[0])  + "** 🎁"
+                    birthday_msg = "Your current birthday is 🎉 **" + _beautify_date(birthday)  + "** 🎁"
                 elif isinstance(ctx.channel, discord.abc.GuildChannel):
                     visible_msg = "\n**Visible in this server:** "
                     if await _is_birthday_shown(ctx.author.id, ctx.guild.id):
@@ -431,7 +431,6 @@ class Birthday(commands.Cog):
 
         user_birthday = await _get_birthday(author_id)
         if user_birthday:
-            user_birthday = user_birthday[0]
             priv_title = f"Your birthday is: {_beautify_date(user_birthday)}"
         else:
             priv_title = "You have not set a birthday. Use `!bd set` to see how."
