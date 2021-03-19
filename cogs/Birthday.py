@@ -205,7 +205,7 @@ class Birthday(commands.Cog):
     @commands.group(name="birthday", aliases=["bd", "bday"])    # !birthday set
     async def birthday(self, ctx):
         """
-        Base command. Shows the status of your birthday and whether it is visible in this server.
+        Base command. Shows the status of your birthday and whether it is announced in this server.
         
         
         "!birthday" or "!bd"
@@ -229,7 +229,7 @@ class Birthday(commands.Cog):
                 if isinstance(ctx.channel, discord.DMChannel):
                     birthday_msg = "Your current birthday is 🎉 **" + _beautify_date(birthday)  + "** 🎁"
                 elif isinstance(ctx.channel, discord.abc.GuildChannel):
-                    visible_msg = "\n**Visible in this server:** "
+                    visible_msg = "\n**Announced in this server:** "
                     if await _is_birthday_shown(ctx.author.id, ctx.guild.id):
                         visible_msg += "☑️"
                     else:
@@ -319,7 +319,7 @@ class Birthday(commands.Cog):
                 else:
                     ## make bday permanent
                     await _set_birthday(ctx.author.id, iso_birthday)
-                    not_shown_msg = "\n\nYour birthday is not currently shown in any servers. To show it here, type `!bd toggle`"
+                    not_shown_msg = "\n\n\N{WARNING SIGN}Your birthday will **not** be announced in any servers. To enable announcements here, type `!bd toggle`"
 
                     embed.description = f"🥳 Congratulations! Your birthday has been updated to **{_beautify_date(iso_birthday)}**. 🎊"
                     if not (await _get_shown_guild_ids(ctx.author.id)):
@@ -391,9 +391,9 @@ class Birthday(commands.Cog):
 
             msg = ""
             if shown:
-                msg = "Your birthday is now **visible** in this server. ☑️"
+                msg = "Your birthday **will be announced** in this server. ☑️"
             else:
-                msg = "Your birthday is now **hidden** in this server. ❌"
+                msg = "Your birthday **will not be announced** in this server. ❌"
 
         else:
             msg = "You can only use this command in a server."
