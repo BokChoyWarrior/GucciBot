@@ -1,4 +1,5 @@
 import aiosqlite
+import sqlite3
 import asyncio
 
 # Notes on SQLite and SQLite3
@@ -23,6 +24,7 @@ c = None
 async def db_connect():
     global conn, c
     conn = await aiosqlite.connect("gucci.db")
+    conn.row_factory = sqlite3.Row
     return conn
 
 async def set_data(command, args_tuple):
