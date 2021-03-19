@@ -22,6 +22,8 @@ async def _set_birthday(user_id, iso_birthday):
 
 async def _get_birthday(user_id):
     birthday = (await db.get_one_data("SELECT bday_date FROM users WHERE id = ?", (user_id,)))
+    if birthday == None or len(birthday) == 0:
+        return None
     return birthday
 
 async def _set_birthday_channel_id(guild_id, channel_id):
@@ -203,11 +205,11 @@ class Birthday(commands.Cog):
     @commands.group(name="birthday", aliases=["bd", "bday"])    # !birthday set
     async def birthday(self, ctx):
         """
-        Base command. Shows the status of your birthday and whether it is visible in this guild.
+        Base command. Shows the status of your birthday and whether it is visible in this server.
         
         
         "!birthday" or "!bd"
-        "!bd <subcommand>" eg "!bd guilds"
+        "!bd <subcommand>" eg "!bd servers"
         """
         if ctx.invoked_subcommand:
             return
@@ -225,9 +227,9 @@ class Birthday(commands.Cog):
                 birthday_msg = ""
                 visible_msg = ""
                 if isinstance(ctx.channel, discord.DMChannel):
-                    birthday_msg = "Your current birthday is 🎉 **" + _beautify_date(birthday)  + "** 🎁"
+                    birthday_msg = "Your current birthday is 🎉 **" + _beautify_date(birthday[0])  + "** 🎁"
                 elif isinstance(ctx.channel, discord.abc.GuildChannel):
-                    visible_msg = "\n**Visible in this guild:** "
+                    visible_msg = "\n**Visible in this server:** "
                     if await _is_birthday_shown(ctx.author.id, ctx.guild.id):
                         visible_msg += "☑️"
                     else:
@@ -237,7 +239,7 @@ class Birthday(commands.Cog):
                     birthday_msg +
                     visible_msg
                 )
-                end_tip = "\n\n_Use command `!birthday guilds` to see in which guilds your birthday will be announced._"
+                end_tip = "\n\n_Use command `!birthday servers` to see in which servers your birthday will be announced._"
 
                 embed.description = msg
                 embed.add_field(name=ZERO_WIDTH_CHAR, value=end_tip, inline=False)
@@ -255,7 +257,7 @@ class Birthday(commands.Cog):
         "!birthday set 25.12"
         """
         description = ""
-        end_tip = "_To show or hide your birthday in a guild, use the command `!bd toggle` in a channel in the guild._"
+        end_tip = "_To show or hide your birthday in a server, use the command `!bd toggle` in a channel in the server._"
         end_warning = "\N{WARNING SIGN}** Warning: Setting your birthday is currently __permanent__. Please make sure it is correct!**"
         embed = GET_BASE_EMBED()
         author_id = ctx.author.id
@@ -315,7 +317,7 @@ class Birthday(commands.Cog):
                 else:
                     ## make bday permanent
                     await _set_birthday(ctx.author.id, iso_birthday)
-                    not_shown_msg = "\n\nYour birthday is not currently shown in any guilds. To show it here, type `!bd toggle`"
+                    not_shown_msg = "\n\nYour birthday is not currently shown in any servers. To show it here, type `!bd toggle`"
 
                     embed.description = f"🥳 Congratulations! Your birthday has been updated to **{_beautify_date(iso_birthday)}**. 🎊"
                     if not (await _get_shown_guild_ids(ctx.author.id)):
@@ -366,10 +368,10 @@ class Birthday(commands.Cog):
             embed.description = msg
             await ctx.send(embed=embed)
 
-    @birthday.group(name="toggle", aliases=["hide", "show"], usage="`!birthday toggle` to toggle birthday announces in this guild.")
+    @birthday.group(name="toggle", aliases=["hide", "show"], usage="`!birthday toggle` to toggle birthday announces in this server.")
     async def user_toggle_visibility(self, ctx):
         """
-        Toggles whether birthday will be announced in this guild.
+        Toggles whether birthday will be announced in this server.
         
         "!birthday toggle"
         """
@@ -387,23 +389,23 @@ class Birthday(commands.Cog):
 
             msg = ""
             if shown:
-                msg = "Your birthday is now **visible** in this guild. ☑️"
+                msg = "Your birthday is now **visible** in this server. ☑️"
             else:
-                msg = "Your birthday is now **hidden** in this guild. ❌"
+                msg = "Your birthday is now **hidden** in this server. ❌"
 
         else:
-            msg = "You can only use this command in a guild."
+            msg = "You can only use this command in a server."
 
         embed.description = msg
         await ctx.send(embed=embed)
 
 
-    @birthday.group(name="guilds", aliases=["g"])
+    @birthday.group(name="servers", aliases=["s", "server"])
     async def user_get_shown_guilds(self, ctx):
         """
-        Shows the guilds in which your birthday will be announced.
+        Shows the servers in which your birthday will be announced.
 
-        "!birthday guilds"
+        "!birthday servers"
         """
         author_id = ctx.author.id
         ## declare priv message variables so that the second block can access them
@@ -420,24 +422,25 @@ class Birthday(commands.Cog):
         pub_embed.description = ""
         pub_description = ""
 
-        end_tip = "\n\n_To hide or show in a particular guild, type `!birthday toggle` in a text channel there._"
+        end_tip = "\n\n_To hide or show in a particular server, type `!birthday toggle` in a text channel there._"
 
         # 
         guild_names = await self._get_shown_guild_names(author_id)
 
         user_birthday = await _get_birthday(author_id)
         if user_birthday:
+            user_birthday = user_birthday[0]
             priv_title = f"Your birthday is: {_beautify_date(user_birthday)}"
         else:
             priv_title = "You have not set a birthday. Use `!bd set` to see how."
 
         if len(guild_names) > 0: ## check just in case one or more guild_id didnt convert to a name
-            priv_description = "**Your birthday will be announced in the following guilds:**\n"
+            priv_description = "**Your birthday will be announced in the following servers:**\n"
             priv_description += (
                 "\n".join(["**"+str(i)+".** "+str(name) for i, name in enumerate(guild_names, start=1)])
             )
         else:
-            priv_title = "Your birthday will not be announced in any guilds."
+            priv_title = "Your birthday will not be announced in any servers."
 
         priv_embed.title = priv_title
         priv_embed.description = priv_description
@@ -497,9 +500,9 @@ class Birthday(commands.Cog):
                     channel_id = channel.id
 
         if channel_id is None:
-            msg = "I could not find that channel in this guild."
+            msg = "I could not find that channel in this server."
         elif not self.bot.get_channel(channel_id) in ctx.guild.channels:
-            msg = "I could not find that channel in this guild, please make sure I have valid roles to see the channel."
+            msg = "I could not find that channel in this server, please make sure I have valid roles to see the channel."
         elif not ctx.me.permissions_in(self.bot.get_channel(channel_id)).send_messages:
             msg = "I do not have the permission to send messages in that channel."
 
