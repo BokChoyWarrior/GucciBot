@@ -91,7 +91,7 @@ class Memevoting(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if message.author.bot:
+        if message.author.bot or not isinstance(message.channel, discord.abc.GuildChannel):
             return
 
         guild_data = (await get_guild_data(int(message.guild.id))) # this should be cached somewhere!!!!!!!!! TODO TODO TODO
