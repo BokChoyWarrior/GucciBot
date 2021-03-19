@@ -288,8 +288,10 @@ class Birthday(commands.Cog):
                 iso_birthday = _extract_birthday(date)
 
             except Exception as e:
-                description =   "👨🏽‍💻 Please input a valid date as follows: `dd.mm`. For example: `!birthday set 8.1` for 8th Januray. ☸️"\
-                                "\n\n\n**You should *not* enter the year.**"
+                
+                description =   f"""I'm sorry, but **{date}** is not valid.⛔\n\n
+                                👨🏽‍💻 Please input a valid date as follows: `dd.mm`. For example: `!birthday set 8.1` for 8th Januray. ☸️
+                                \n\nYou should **not** enter the year."""
                 embed.description = description
                 embed.add_field(name=ZERO_WIDTH_CHAR, value=end_tip, inline=False)
                 await ctx.send(embed=embed)
