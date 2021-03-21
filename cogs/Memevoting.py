@@ -1,11 +1,7 @@
-import asyncio
 import datetime as dt
-import json
-import sqlite3
-from cogs.utils import db
 import discord
 from discord.ext import commands, tasks
-import traceback, sys
+from cogs.utils import db
 from constants import ZERO_WIDTH_CHAR
 
 async def get_guild_data(guild_id):
@@ -208,9 +204,9 @@ class Memevoting(commands.Cog):
 
             try:
                 await member.add_roles(meme_winner_role, reason="meme contest")
-            except discord.Forbidden as e:
+            except discord.Forbidden:
                 print("Bot does not have permission to add these roles.")
-            except discord.HTTPException as e:
+            except discord.HTTPException:
                 print("Unable to add roles!")
 
     async def remove_meme_role(self, guild_id):
