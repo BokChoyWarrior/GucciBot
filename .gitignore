@@ -146,3 +146,6 @@ dmypy.json
 
 #intellij
 .idea/
+
+# pylinter
+.pylintrc
