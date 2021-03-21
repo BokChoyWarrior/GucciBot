@@ -1,3 +1,4 @@
+# Custom
 images/
 dbtest.py
 config.py
@@ -8,6 +9,7 @@ backslash.mp3
 *.jpeg
 sounds/say.mp3
 SeriousChannels_backup.json
+*.db
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
