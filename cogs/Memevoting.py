@@ -30,10 +30,10 @@ async def get_reaction_results(messages, emoji):
         will return a list of messages with the most emoji reactions
     """
 
-    # start reaction count at 2 because the bot should have reacted once
+    # start reaction count at 1 because the bot may not have reacted once
     # and we only want to count messages that have had at least 1 human 
-    # react to them 1(bot) + 1(human) = 2
-    max_reactions = 2
+    # react to them
+    max_reactions = 1
 
     results = []
 
@@ -41,13 +41,18 @@ async def get_reaction_results(messages, emoji):
         for reaction in message.reactions:
             if reaction.emoji != emoji:
                 continue
+            
+            # If bot reacted, we don't want to tally this
+            human_reaction_count = reaction.count
+            if reaction.me:
+                human_reaction_count -= 1
 
-            if reaction.count == max_reactions:
+            if human_reaction_count == max_reactions:
                 results.append(message)
 
-            if reaction.count > max_reactions:
+            if human_reaction_count > max_reactions:
                 results = [message]
-                max_reactions = reaction.count
+                max_reactions = human_reaction_count
 
     return results, max_reactions - 1
 
