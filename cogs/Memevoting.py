@@ -82,6 +82,8 @@ class Memevoting(commands.Cog):
             guild_data = await get_guild_data(guild_id)
             memechannel = self.bot.get_channel(guild_data["memechannel_id"])
             last_scan = dt.datetime.fromisoformat(guild_data["last_scan"])
+            # discord.abc.Messageable.history only accepts naive datetime objects :(
+            last_scan = last_scan.replace(tzinfo=None)
             messages = await memechannel.history(after=last_scan).flatten()
             for message in messages:
                 if not message.author == self.bot.user:
