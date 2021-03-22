@@ -22,12 +22,12 @@ async def react_to_message(message):
 
 async def get_reaction_results(messages, emoji):
     """
-        When given a list of :Class: Message and an emoji, 
+        When given a list of :Class: Message and an emoji,
         will return a list of messages with the most emoji reactions
     """
 
     # start reaction count at 1 because the bot may not have reacted once
-    # and we only want to count messages that have had at least 1 human 
+    # and we only want to count messages that have had at least 1 human
     # react to them
     max_reactions = 1
 
@@ -37,7 +37,7 @@ async def get_reaction_results(messages, emoji):
         for reaction in message.reactions:
             if reaction.emoji != emoji:
                 continue
-            
+
             # If bot reacted, we don't want to tally this
             human_reaction_count = reaction.count
             if reaction.me:
@@ -100,7 +100,7 @@ class Memevoting(commands.Cog):
 
             time_since_last_scan = self.current_scan - last_scan
 
-            
+
             if dt.timedelta(days=2) < time_since_last_scan < dt.timedelta(days=7):
                 await self.remove_meme_role(guild_id)
 
@@ -118,7 +118,7 @@ class Memevoting(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if (message.author.bot or not 
+        if (message.author.bot or not
             isinstance(message.channel, discord.abc.GuildChannel)):
             # do nothing if we detect the bot's message, 
             # or message wasnt in a guild.
@@ -127,8 +127,9 @@ class Memevoting(commands.Cog):
         # We would like to react to the message with a thumbs up if
         #  message was sent in that guild's meme channel
 
-        # TODO: guild_data should be cached somewhere
-        # TODO: and updated if values change
+        # TODO: 
+        #   guild_data should be cached somewhere
+        #   and updated if values change
         guild_data = (await get_guild_data(message.guild.id))
         if message.channel.id == guild_data["memechannel_id"]:
             await react_to_message(message)
@@ -159,7 +160,7 @@ class Memevoting(commands.Cog):
                 attachment.filename.endswith(".png")):
                 # attachment is an image
                 embed.set_image(url=attachment.url)
-            
+
             for attachment in participant_msg.attachments:
                 main_content += f"[{attachment.filename}]({attachment.url})\n"
 
