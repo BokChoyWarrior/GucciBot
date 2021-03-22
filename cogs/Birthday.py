@@ -13,7 +13,7 @@ def _2020ify_date(iso_date):
 
 def _beautify_date(iso_date):
     date = dt.date.fromisoformat(iso_date)
-    return date.strftime("%d %B")
+    return date.strftime("%d %B").strip("0")
 
 async def _set_birthday(user_id, iso_birthday):
     await db.set_data(
