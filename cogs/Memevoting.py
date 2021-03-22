@@ -62,6 +62,7 @@ class Memevoting(commands.Cog):
         self.guild_ids = []
 
         self.current_scan = dt.datetime.now(tz=dt.timezone.utc)
+        # pylint: disable=maybe-no-member
         self.meme_contest_bg_task.start()
 
 
