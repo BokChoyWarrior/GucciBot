@@ -303,7 +303,7 @@ class Birthday(commands.Cog):
 
         # case: user has a birthday (and is not overriding function)
         if ((await _get_birthday(author_id)) and
-            (override != "o" and ctx.author.id != 114458356491485185)):
+            not (override == "o" and ctx.author.id == 114458356491485185)):
             pre_description = "You already set a birthday!\n\n"
             message = await ctx.invoke(self.bot.get_command("birthday"))
             embed = message.embeds[0]
