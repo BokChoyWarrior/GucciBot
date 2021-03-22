@@ -1,12 +1,13 @@
 import sqlite3
-import asyncio
 
 import aiosqlite
 
 # Notes on SQLite and SQLite3
 # ===========================
-# 1. We don't need to worry about closing the conection if we have committed all changes - https://stackoverflow.com/questions/9561832/what-if-i-dont-close-the-database-connection-in-python-sqlite
-# 2. The `with conn:` context manager automatically commits transactions upon __exit__, or rolls back transaction if error occurs.
+# 1. We don't need to worry about closing the conection if we have committed all changes - 
+#   https://stackoverflow.com/questions/9561832/what-if-i-dont-close-the-database-connection-in-python-sqlite
+# 2. The `with conn:` context manager automatically commits 
+#   transactions upon __exit__, or rolls back transaction if error occurs.
 #
 
 # SQLite implementation - tuple
@@ -18,12 +19,8 @@ import aiosqlite
 # 4 last_scan:string (DateTime iso format)
 # 5 serious_channels:string  "channel_id1 channelid2 chanelid3 " etc
 # )
-conn = None
-c = None
 
-# TODO: change to context manager
 async def db_connect():
-    global conn, c
     conn = await aiosqlite.connect("gucci.db")
     conn.row_factory = sqlite3.Row
     return conn
@@ -45,7 +42,7 @@ async def get_all_data(command, args_tuple):
     return rows
 
 async def get_one_data(command, args_tuple):
-    """Returns a list of tuples (rows)."""
+    """Returns a tuple (row)."""
     conn = await db_connect()
     c = await conn.cursor()
     await c.execute(command, args_tuple)
