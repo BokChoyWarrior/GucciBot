@@ -40,8 +40,8 @@ class Fun(commands.Cog):
     @commands.command()
     @commands.guild_only()
     @commands.is_owner()
-    async def message(self, ctx):
-        my_message = ctx.message.content[8:]
+    async def message(self, ctx, *args):
+        my_message = "".join(args)
         await ctx.message.delete()
         await ctx.send(my_message)
 

@@ -23,13 +23,18 @@ class Basics(commands.Cog):
         await self.bot.close()
 
     @commands.command(aliases=["p"])
-    async def ping(self, ctx: commands.Context):
+    async def ping(self, ctx):
         """Shows the Gateway Ping."""
         t1 = time.perf_counter()
         await ctx.trigger_typing()
         t2 = time.perf_counter()
         await ctx.send(f":hourglass: gateway ping: {round((t2 - t1) * 1000)}ms :hourglass:")
 
+
+    @commands.command(name="emoji")
+    async def emoji(self, ctx, *args):
+        emojis = "\n".join(args)
+        await ctx.send(f"```{emojis}```")
     # @commands.command()
     # @commands.is_owner()
     # async def setpresence(self, ctx, *, content):
