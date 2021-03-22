@@ -34,7 +34,7 @@ class Configs(commands.Cog):
         channel_id = await handle_input(ctx, text)
         if not channel_id:
             return
-        serious = utils.change_seriousness(ctx, channel_id)
+        serious = await utils.change_seriousness(ctx, channel_id)
         if not serious:
             srs_string = "not "
         else:
@@ -46,11 +46,14 @@ class Configs(commands.Cog):
     Where channel_id is an id of a voice channel in your server.""")
     @commands.guild_only()
     async def isserious(self, ctx, text):
-        """Checks a voice channel's serious level. (Whether or not the bot can use voice in the channel)"""
+        """
+        Checks a voice channel's serious level. 
+        (Whether or not the bot can use voice in the channel)
+        """
         channel_id = await handle_input(ctx, text)
         if not channel_id:
             return
-        if utils.channel_is_serious(str(ctx.guild.id), str(channel_id)):
+        if await utils.channel_is_serious(str(ctx.guild.id), str(channel_id)):
             reply = " is serious - audio will not play there."
         else:
             reply = " is not serious - audio will play there."
@@ -60,7 +63,7 @@ class Configs(commands.Cog):
     @commands.command()
     @commands.guild_only()
     async def listserious(self, ctx):
-        serious_channels = utils.get_serious_channel_data(ctx.guild.id)
+        serious_channels = await utils.get_serious_channel_data(ctx.guild.id)
         # print(serious_channels)
         if serious_channels:
             reply = "**Serious voice channels in this server:**\n"

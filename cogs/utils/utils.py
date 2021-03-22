@@ -13,37 +13,35 @@ def measure_time(description: str) -> None:
     print(f"'{description}' took: {(perf_counter() - t1):.04f} s")
 
 
-def get_serious_channel_data(guild_id):
-    data = db.get_data("SELECT serious_channels FROM guild_info WHERE guild_id=?", (guild_id,))[0]
+async def get_serious_channel_data(guild_id):
+    data = await db.get_one_data((
+        "SELECT serious_channels FROM guild_info "
+        "WHERE guild_id=?"),
+        (guild_id,))
+    data = data["serious_channels"]
     data = data.split()
     return data
 
 
-def channel_is_serious(guild_id, channel_id, data=None):
+async def channel_is_serious(guild_id, channel_id, data=None):
     if not data:
-        data = get_serious_channel_data(guild_id)
-    # print(type(channel_id))
-    # print(data[guild_id])
-    if str(channel_id) in data:
-        # print("Found channel")
-        return True
-    else:
-        # print("Didnt find channel")
-        return False
+        data = await get_serious_channel_data(guild_id)
+
+    return bool(channel_id in data)
 
 
-def change_seriousness(ctx, channel_id):
+async def change_seriousness(ctx, channel_id):
     channel_id = str(channel_id)
     guild_id = ctx.guild.id
-    data = get_serious_channel_data(guild_id)
-    if channel_is_serious(guild_id, channel_id, data=data):
+    data = await get_serious_channel_data(guild_id)
+    if await channel_is_serious(guild_id, channel_id, data=data):
         data.remove(channel_id)
         serious = False
     else:
         data.append(channel_id)
         serious = True
     data = " ".join(data)
-    db.set_data("UPDATE guild_info SET serious_channels=? WHERE guild_id=?", (data, guild_id))
+    await db.set_data("UPDATE guild_info SET serious_channels=? WHERE guild_id=?", (data, guild_id))
     return serious
 
 
@@ -64,18 +62,18 @@ async def play_files(files, ctx):
     else:
         files_to_play = files
 
-    if type(ctx) == discord.ext.commands.Context:
+    if isinstance(ctx, discord.ext.commands.Context):
         if ctx.author.voice:
             voice_channel = ctx.author.voice.channel
         else:
             await ctx.send("You are not connected to a voice channel.", delete_after=10)
-    elif type(ctx) == discord.VoiceChannel:
+    elif isinstance(ctx, discord.VoiceChannel):
         voice_channel = ctx
     else:
         print("Invalid argument provided (ctx):\n" + repr(ctx))
         return
 
-    if channel_is_serious(voice_channel.guild.id, voice_channel.id):
+    if await channel_is_serious(voice_channel.guild.id, voice_channel.id):
         return
 
     voice_join_failures = 0
@@ -88,23 +86,29 @@ async def play_files(files, ctx):
             # catching most common errors that can occur while playing effects
         except discord.Forbidden:
             await ctx.send(
-                "Command raised error \"403 Forbidden\". Please check if bot has permission to join and speak in voice "
-                "channel")
+                "Command raised error \"403 Forbidden\"."
+                " Please check if bot has permission to join and speak in voice channel"
+            )
             return
         except asyncio.TimeoutError:
             await ctx.send(
-                "There was an error while joining channel (Timeout). It's possible that either Discord API or bot host "
-                "has latency/connection issues. Please try again later.")
+                "There was an error while joining channel (Timeout). "
+                "It's possible that either Discord API or bot host "
+                "has latency/connection issues. Please try again later."
+            )
             return
         except discord.ClientException:
-            await ctx.send("I am already playing a sound! Please wait until the current sound is done playing!")
+            await ctx.send(
+                "I am already playing a sound! Please wait until the current sound is done playing!"
+            )
             return
         except Exception as e:
             await ctx.send(
-                "There was an error processing your request. Please try again. If issues continues, contact bot owner.")
+                "There was an error processing your request. Please try again later."
+            )
             print(f'Error trying to join a voicechannel: {e}')
             return
-    
+
     rick_o_meter = random.randint(1, 100)
     if rick_o_meter == 1:
         files_to_play = ["sounds/rickroll.mp3"]
@@ -115,27 +119,28 @@ async def play_files(files, ctx):
 
             # edge case: missing file error
         except FileNotFoundError:
-            await ctx.send(
-                "There was an issue with playing sound: File Not Found. Its possible that host of bot forgot to copy "
-                "over a file.")
+            await ctx.send("There was an issue with playing sound: File Not Found.")
 
         try:
             voice_channel.play(source)
             # catching most common errors that can occur while playing effects
         except discord.Forbidden:
-            await ctx.send("There was an issue playing a sound effect. please check if bot has speak permission")
+            await ctx.send(
+                "There was an issue playing the sound. please check if bot has speak permission"
+            )
             await voice_channel.disconnect()
             return
         except TimeoutError:
             await ctx.send(
-                "There was an error while attempting to play the sound effect (Timeout) its possible that either discord "
-                "API or bot host has latency or network issues. Please try again later, if issues continue, contact "
-                "bot owner")
+                "There was a timeout while attempting to play the sound."
+            )
             await voice_channel.disconnect()
             return
         except Exception as e:
             await ctx.send(
-                "There was an issue playing the sound. Please try again later. If issues continue, contact bot owner.")
+                "There was an issue playing the sound. Please try again later. "
+                "If issues continue, contact bot owner."
+            )
             await voice_channel.disconnect()
             print(f'Error trying to play a sound: {e}')
             return

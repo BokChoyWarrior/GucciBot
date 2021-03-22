@@ -1,5 +1,5 @@
 import json
-from .utils import utils
+from utils import utils
 from discord.ext import commands
 
 
@@ -9,20 +9,9 @@ def cache_replies():
         fp = "cogs/cogfigs/Audio.json"
         with open(fp) as f:
             data = json.load(f)["reply_commands"]
-    except FileNotFoundError as e:
-        print(e, "file path is:", fp, sep=" ")
+    except FileNotFoundError as error:
+        print(error, "file path is:", fp, sep=" ")
     return data
-    # for sound_command in data["sound_commands"]:
-    #     word = utils.message_contains(sound_command["phrases"], message)
-    #     if word:
-    #         fp = "sounds/" + str(random.choice(sound_command["sounds"]))
-    #         fp = bitconnect(fp)
-    #         if message.author.voice:
-    #             await utils.play_files(fp, message)
-    #             break
-    #         # else:
-    #         #     f = discord.File(fp, filename=fp)
-    #         #     await message.author.send(content="", tts=False, embed=None, file=f, files=None, nonce=None)
 
 
 def fetch_reply(word, reply_command):

@@ -1,6 +1,7 @@
-import aiosqlite
 import sqlite3
 import asyncio
+
+import aiosqlite
 
 # Notes on SQLite and SQLite3
 # ===========================
