@@ -149,3 +149,4 @@ dmypy.json
 
 # pylinter
 .pylintrc
+gucci.db
