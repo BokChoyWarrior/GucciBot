@@ -125,15 +125,25 @@ async def _get_shown_guild_ids(user_id):
 #########################################################
 prompt_dicts = {"set_bday": {}, "set_bday_channel": {}}
 
-async def _add_prompt(prompt_dict, key, prompt):
-    if key in prompt_dicts[prompt_dict]:
-        await _delete_prompt(prompt_dict, key)
-    else:
-        prompt_dicts[prompt_dict][key] = prompt
+async def _add_prompt(prompt_dict, user_id, prompt):
+    if user_id in prompt_dicts[prompt_dict]:
+        await _delete_prompt(prompt_dict, user_id)
 
-async def _delete_prompt(prompt_dict, key):
-    await prompt_dicts[prompt_dict][key].delete()
-    del prompt_dicts[prompt_dict][key]
+    prompt_dicts[prompt_dict][user_id] = prompt
+
+async def _delete_prompt(prompt_dict, user_id):
+    try:
+        await prompt_dicts[prompt_dict][user_id].delete()
+    except (discord.Forbidden, discord.NotFound, discord.HTTPException):
+        pass
+    try:
+        del prompt_dicts[prompt_dict][user_id]
+    except KeyError:
+        pass
+
+async def _delete_prompt_if_exists(prompt_dict, user_id, prompt):
+    if user_id in prompt_dicts[prompt_dict] and prompt_dicts[prompt_dict][user_id] == prompt:
+        await _delete_prompt(prompt_dict, user_id)
 #########################################################
 
 async def _get_last_birthday_scan():
@@ -368,7 +378,7 @@ class Birthday(commands.Cog):
                 timeout=30.0
             )
         except asyncio.TimeoutError:
-            pass
+            await _delete_prompt_if_exists("set_bday", author_id, prompt)
         else:
             ## make bday permanent
             await _set_birthday(ctx.author.id, iso_birthday)
@@ -383,7 +393,6 @@ class Birthday(commands.Cog):
                 f"**{_beautify_date(iso_birthday)}**. 🎊"
             )
 
-            #TODO: beautify!
             if not await _get_shown_guild_ids(ctx.author.id):
                 embed.description += not_shown_msg
             embed.clear_fields()
@@ -396,7 +405,7 @@ class Birthday(commands.Cog):
                 inline=False)
 
             sent = await ctx.send(embed=embed)
-            await _delete_prompt("set_bday", author_id)
+            await _delete_prompt_if_exists("set_bday", author_id, prompt)
 
             await asyncio.sleep(60.0)
             embed.description = (
@@ -407,9 +416,6 @@ class Birthday(commands.Cog):
 
             embed.clear_fields()
             await sent.edit(embed=embed)
-
-        finally:
-            await _delete_prompt("set_bday", author_id)
 
 
     @commands.is_owner()
