@@ -1,6 +1,5 @@
 import asyncio
 import datetime as dt
-from calendar import month_name
 from collections import defaultdict#
 
 import discord
@@ -13,7 +12,8 @@ def _2020ify_date(iso_date):
     return "2020" + iso_date[4:]
 
 def _beautify_date(iso_date):
-    return str(int(iso_date[8:])) + " " + month_name[int(iso_date[5:7])]
+    date = dt.date.fromisoformat(iso_date)
+    return date.strftime("%d %B")
 
 async def _set_birthday(user_id, iso_birthday):
     await db.set_data(
