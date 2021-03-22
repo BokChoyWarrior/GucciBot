@@ -1,11 +1,13 @@
 import traceback
-from datetime import datetime
-from discord.ext import commands
-import discord
-import logging
-import config
 import shutil
+import logging
+from datetime import datetime
+
+import discord
+from discord.ext import commands
 from pretty_help import PrettyHelp
+
+import config
 from constants import EMBED_COLOUR
 
 # check for ffmpeg
@@ -29,26 +31,26 @@ logger.addHandler(handler)
 intents = discord.Intents.all()
 intents.presences = False
 
-prefix = config.prefix
-bot = commands.Bot(command_prefix=prefix, description="Welcome to GucciBot!\nCommands are below:",
+PREFIX = config.prefix
+bot = commands.Bot(command_prefix=PREFIX, description="Welcome to GucciBot!\nCommands are below:",
                    case_insensitive=True, intents=intents)
 
 # help command setup from PrettyHelp
 bot.help_command = PrettyHelp(active_time=120.0, color=EMBED_COLOUR)
 # bot.help_command = commands.DefaultHelpCommand()
 initial_extensions = [
-    'Fun',
-    'Audio',
-    "Basics",
-    "Replies",
-    "Memevoting",
-    "MyCaptionBot",
-    "Timer",
-    "Configs",
+    # 'Fun',
+    # 'Audio',
+    # "Basics",
+    # "Replies",
+    # "Memevoting",
+    # "MyCaptionBot",
+    # "Timer",
+    # "Configs",
     "Birthday",
 
     "CommandErrorHandler",
-    
+
     # "Basics2"
     # "ImageTools",
 ]
@@ -129,10 +131,6 @@ async def on_message(message):
           "Time        : {1}\n".format(message, time))
 
     await bot.process_commands(message)
-
-@bot.event
-async def on_command(ctx):
-    pass
 
 if __name__ == '__main__':
     for extension in initial_extensions:
