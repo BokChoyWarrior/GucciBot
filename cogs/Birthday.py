@@ -79,7 +79,7 @@ def _extract_birthday_to_iso(user_given_date):
     return iso_birthday
 
 
-async def _is_birthday_shown(user_id, guild_id):
+async def _is_birthday_shown_here(user_id, guild_id):
     shown = await db.get_one_data(
         """SELECT EXISTS(
             SELECT 1 FROM user_bday_shown_guilds
@@ -93,7 +93,7 @@ async def _is_birthday_shown(user_id, guild_id):
     return shown[0]
 
 async def _birthday_toggle_visibility(user_id, guild_id):
-    visible = await _is_birthday_shown(user_id, guild_id)
+    visible = await _is_birthday_shown_here(user_id, guild_id)
 
     if visible:
         await db.set_data(
@@ -102,11 +102,11 @@ async def _birthday_toggle_visibility(user_id, guild_id):
             (user_id, guild_id)
         )
         return False
-    else:
-        await db.set_data(
-            "INSERT INTO user_bday_shown_guilds VALUES (?, ?)",
-            (user_id, guild_id))
-        return True
+    # implicit else:
+    await db.set_data(
+        "INSERT INTO user_bday_shown_guilds VALUES (?, ?)",
+        (user_id, guild_id))
+    return True
 
 async def _delete_birthday(user_id):
     await db.set_data("UPDATE users SET bday_date=null WHERE id=?", (user_id,))
@@ -180,6 +180,14 @@ class Birthday(commands.Cog):
 
         return guild_names
 
+    async def _get_enumerated_guild_names(self, user_id):
+        guild_names = await self._get_shown_guild_names(user_id)
+
+        enumerated = "\n".join([f"**{i}.** {name}" for i, name in enumerate(guild_names, start=1)])
+
+        return enumerated
+
+
     @tasks.loop(hours=3)
     async def birthday_bg_task(self):
         last_birthday_scan_2020_iso = await _get_last_birthday_scan()
@@ -194,6 +202,7 @@ class Birthday(commands.Cog):
             "UPDATE bot_info SET last_bd_scan=?",
             (todays_date_2020_iso,))
 
+        await self.message_imminent_birthdays()
 
         birthday_list = await db.get_all_data(
             """
@@ -238,6 +247,41 @@ class Birthday(commands.Cog):
     async def before_birthday_bg_task(self):
         await self.bot.wait_until_ready()
 
+
+    async def message_imminent_birthdays(self):
+        week_from_today = dt.date.today() + dt.timedelta(days=7)
+        week_from_today_2020_iso = _2020ify_date(week_from_today.isoformat())
+
+        users_with_birthday_soon = await db.get_all_data(
+            """
+            SELECT users.id FROM users
+            WHERE users.bday_date = ?
+            """,
+            (week_from_today_2020_iso,)
+        )
+
+        if not users_with_birthday_soon:
+            return
+
+        for user_id_row in users_with_birthday_soon:
+            user_id = user_id_row["id"]
+            embed = GET_BASE_EMBED()
+            main_title = "Your birthday will not be announced in any servers!"
+            main_desc = "To announce it in a server, type `!bd toggle` in a channel there."
+            
+            enumerated_guild_names = await self._get_enumerated_guild_names(user_id)
+
+            if enumerated_guild_names:
+                main_title = "Your birthday will be announced in the following guilds:"
+                main_desc = enumerated_guild_names
+            
+            user = self.bot.get_user(user_id)
+
+            embed.title = main_title
+            embed.description = main_desc
+            await user.send(embed=embed)
+
+
     @commands.group(name="birthday", aliases=["bd", "bday"])
     async def birthday(self, ctx):
         """
@@ -268,7 +312,7 @@ class Birthday(commands.Cog):
                 )
             elif isinstance(ctx.channel, discord.abc.GuildChannel):
                 visible_msg = "\n**Announced in this server:** "
-                if await _is_birthday_shown(ctx.author.id, ctx.guild.id):
+                if await _is_birthday_shown_here(ctx.author.id, ctx.guild.id):
                     visible_msg += "☑️"
                 else:
                     visible_msg += "❌"
