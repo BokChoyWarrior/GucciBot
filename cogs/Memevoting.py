@@ -187,6 +187,8 @@ class Memevoting(commands.Cog):
         meme_winner_role = guild.get_role(guild_data["meme_winner_role_id"])
         last_scan = dt.datetime.fromisoformat(guild_data["last_scan"])
 
+        # discord.abc.Messageable.history only accepts naive datetime objects :(
+        last_scan = last_scan.replace(tzinfo=None)
         messages = await meme_channel.history(after=last_scan).flatten()
 
         if not (messages and result_channel):
