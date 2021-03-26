@@ -50,7 +50,7 @@ async def get_reaction_results(messages, emoji):
                 results = [message]
                 max_reactions = human_reaction_count
 
-    return results, max_reactions - 1
+    return results, max_reactions
 
 class Memevoting(commands.Cog):
 
