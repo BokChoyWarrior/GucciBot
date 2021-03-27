@@ -89,7 +89,6 @@ async def _is_birthday_shown_here(user_id, guild_id):
         (user_id, guild_id))
 
     # Return first item since either (1,) or (0,) is returned from EXISTS()
-    print(shown.__repr__())
     return shown[0]
 
 async def _birthday_toggle_visibility(user_id, guild_id):
@@ -119,7 +118,8 @@ async def _get_shown_guild_ids(user_id):
         """,
         (user_id,)
     )
-    return guilds
+    guild_ids = [guild_id for guild in guilds if (guild_id:=guild["guild_id"]) is not None]
+    return guild_ids
 
 # These functions help keep track of which is the most recent set birthday prompt given to a user
 #########################################################
@@ -161,31 +161,22 @@ class Birthday(commands.Cog):
         self.birthday_bg_task.start()
 
 
-    async def _get_shown_guild_names(self, user_id):
-        guild_id_tuples = await _get_shown_guild_ids(user_id)
-        guild_names = []
+    async def _get_guild_names(self, guild_ids):
 
-        for guild_id_tuple in guild_id_tuples:
-            try:
-                guild_id = guild_id_tuple["guild_id"]
-                guild_name = self.bot.get_guild(guild_id).name
-
-                if guild_name is None:
-                    raise ValueError(f"Guild with id: {guild_id} was not found")
-
-                guild_names.append(guild_name)
-            except ValueError as error:
-                print(repr(error))
-                continue
+        guild_names = [
+            guild.name
+            for guild_id in guild_ids
+            if (guild := self.bot.get_guild(guild_id)) is not None
+        ]
 
         return guild_names
 
-    async def _get_enumerated_guild_names(self, user_id):
-        guild_names = await self._get_shown_guild_names(user_id)
+    async def _get_enumerated_guild_names(self, guild_names, sep="\n"):
+        enumerated_names = sep.join(
+            [f"**{i}.** {name}" for i, name in enumerate(guild_names, start=1)]
+        )
 
-        enumerated = "\n".join([f"**{i}.** {name}" for i, name in enumerate(guild_names, start=1)])
-
-        return enumerated
+        return enumerated_names
 
 
     @tasks.loop(hours=3)
@@ -248,6 +239,16 @@ class Birthday(commands.Cog):
         await self.bot.wait_until_ready()
 
 
+    async def _get_common_guild_ids(self, user_id):
+        user = self.bot.get_user(user_id)
+
+        guilds = []
+        for guild in self.bot.guilds:
+            if user in guild.members:
+                guilds.append(guild.id)
+
+        return guilds
+
     async def message_imminent_birthdays(self):
         week_from_today = dt.date.today() + dt.timedelta(days=7)
         week_from_today_2020_iso = _2020ify_date(week_from_today.isoformat())
@@ -266,19 +267,38 @@ class Birthday(commands.Cog):
         for user_id_row in users_with_birthday_soon:
             user_id = user_id_row["id"]
             embed = GET_BASE_EMBED()
-            main_title = "Your birthday will not be announced in any servers!"
+            main_title = (
+                "Hey there! It seems like you've set a birthday, "
+                "but you have not set it to announce in any servers."
+            )
             main_desc = "To announce it in a server, type `!bd toggle` in a channel there."
-            
-            enumerated_guild_names = await self._get_enumerated_guild_names(user_id)
+
+            shown_guild_ids = await _get_shown_guild_ids(user_id)
+            shown_guild_names = await self._get_guild_names(shown_guild_ids)
+            enumerated_guild_names = await self._get_enumerated_guild_names(shown_guild_names)
 
             if enumerated_guild_names:
-                main_title = "Your birthday will be announced in the following guilds:"
+                main_title = "Your birthday will be announced in the following servers:"
                 main_desc = enumerated_guild_names
-            
+
+
+            common_guild_ids = set((await self._get_common_guild_ids(user_id)))
+            common_guild_ids_not_shown = list(common_guild_ids.difference(set(shown_guild_ids)))
+            common_not_shown_guild_names = await self._get_guild_names(common_guild_ids_not_shown)
+
+            extra_desc = ""
+            if common_not_shown_guild_names:
+                names = " ---- ".join(common_not_shown_guild_names)
+                extra_desc = (
+                    "\n\n\n\n"
+                    "**Servers in which you could choose to announce your birthday:**\n"
+                    f"_{names}_"
+                )
+
             user = self.bot.get_user(user_id)
 
             embed.title = main_title
-            embed.description = main_desc
+            embed.description = main_desc + extra_desc
             await user.send(embed=embed)
 
 
@@ -555,15 +575,16 @@ class Birthday(commands.Cog):
         else:
             priv_title = "You have not set a birthday. Use `!bd set` to see how."
 
-        guild_names = await self._get_shown_guild_names(author_id)
+        shown_guild_ids = await _get_shown_guild_ids(author_id)
+        shown_guild_names = await self._get_guild_names(shown_guild_ids)
+        enumerated_guild_names= await self._get_enumerated_guild_names(shown_guild_names)
+
         # check just in case one or more guild_id didnt convert to a name
-        if len(guild_names) > 0:
+        if len(enumerated_guild_names) > 0:
             priv_description = (
                 "**Your birthday will be announced in the following servers:**\n"
             )
-            priv_description += (
-                "\n".join([f"**{i}.** {name}" for i, name in enumerate(guild_names, start=1)])
-            )
+            priv_description += enumerated_guild_names
         else:
             priv_title = "Your birthday will not be announced in any servers."
 
