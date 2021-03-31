@@ -31,10 +31,10 @@ class Basics(commands.Cog):
         await ctx.send(f":hourglass: gateway ping: {round((t2 - t1) * 1000)}ms :hourglass:")
 
 
-    @commands.command(name="emoji")
-    async def emoji(self, ctx, *args):
-        emojis = "\n".join(args)
-        await ctx.send(f"```{emojis}```")
+    @commands.command(name="repeat", aliases=["reply", "emoji"])
+    async def repeat(self, ctx, *, args):
+        """Repeats the message you sent back to you, in a code block."""
+        await ctx.send(f"```{args}```")
     # @commands.command()
     # @commands.is_owner()
     # async def setpresence(self, ctx, *, content):
