@@ -179,14 +179,13 @@ class Birthday(commands.Cog):
         return enumerated_names
 
 
-    @tasks.loop(hours=2)
+    @tasks.loop(minutes=20)
     async def birthday_bg_task(self):
         last_birthday_scan_2020_iso = await _get_last_birthday_scan()
         current_scan = dt.datetime.now(dt.timezone.utc)
         todays_date_2020_iso = _2020ify_date(dt.date.today().isoformat())
 
-        if (not current_scan.hour > 9 and
-            last_birthday_scan_2020_iso == todays_date_2020_iso):
+        if current_scan.hour < 9 or last_birthday_scan_2020_iso == todays_date_2020_iso:
             return
 
         await db.set_data(
