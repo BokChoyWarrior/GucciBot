@@ -186,7 +186,7 @@ class Birthday(commands.Cog):
         todays_date_2020_iso = _2020ify_date(dt.date.today().isoformat())
 
         if (not current_scan.hour > 12 and
-            last_birthday_scan_2020_iso != todays_date_2020_iso):
+            last_birthday_scan_2020_iso == todays_date_2020_iso):
             return
 
         await db.set_data(
