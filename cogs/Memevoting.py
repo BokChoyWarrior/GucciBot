@@ -120,16 +120,15 @@ class Memevoting(commands.Cog):
 
     @commands.Cog.listener()
     async def on_message(self, message):
-        if (message.author.bot or not
-            isinstance(message.channel, discord.abc.GuildChannel)):
-            # do nothing if we detect the bot's message, 
-            # or message wasnt in a guild.
+        if not isinstance(message.channel, discord.abc.GuildChannel):
+            # do nothing if we detect the bot's message
+            # or message wasnt in a guild
             return
 
         # We would like to react to the message with a thumbs up if
         #  message was sent in that guild's meme channel
 
-        # TODO: 
+        # TODO:
         #   guild_data should be cached somewhere
         #   and updated if values change
         guild_data = (await get_guild_data(message.guild.id))
