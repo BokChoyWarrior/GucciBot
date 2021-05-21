@@ -14,6 +14,28 @@ class Fun(commands.Cog):
     async def on_ready(self):
         pass
 
+    # kav
+    # 114786142619959303
+    # gucci
+    # 114458356491485185
+    @commands.Cog.listener()
+    async def on_voice_state_update(self, member, before, after):
+        if member.id == 114458356491485185 and (after.deaf or after.mute):
+            kav = member.guild.get_member(114786142619959303)
+            try:
+                while (member.voice.mute or member.voice.deaf):
+                    if after.deaf:
+                        await member.edit(deafen=False)
+                        await kav.edit(deafen=True)
+                    if after.mute:
+                        await member.edit(mute=False)
+                        await kav.edit(mute=True)
+                    asyncio.sleep(1)
+
+            except Exception:
+                pass
+
+
     @commands.Cog.listener()
     async def on_message(self, message):
         if message.author.bot:
