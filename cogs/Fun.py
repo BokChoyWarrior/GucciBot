@@ -71,6 +71,10 @@ class Fun(commands.Cog):
     async def bunker(self, ctx):
         await ctx.send("https://tech4thewin.com/wp-content/uploads/2020/08/9037547777323607125.jpg")
 
+    @commands.command()
+    async def satellite(self, ctx):
+        await ctx.send(file=discord.File('pictures/warzone-satellites.png'))
+
     async def rename_all_members(self, guild_id, name):
         for member in self.bot.get_guild(guild_id).members:
             await asyncio.sleep(1)
