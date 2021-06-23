@@ -71,7 +71,7 @@ class Fun(commands.Cog):
     async def bunker(self, ctx):
         await ctx.send("https://tech4thewin.com/wp-content/uploads/2020/08/9037547777323607125.jpg")
 
-    @commands.command()
+    @commands.command(aliases=["sat"])
     async def satellite(self, ctx):
         await ctx.send(file=discord.File('pictures/warzone-satellites.png'))
 
